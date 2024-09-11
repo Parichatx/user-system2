@@ -3,13 +3,43 @@ package controller
 import (
 	"net/http"
 	"github.com/gin-gonic/gin"
-	"user-system/backend/config"
-	"user-system/backend/entity"
+	"github.com/Parichatx/user-system2/config"
+	"github.com/Parichatx/user-system2/entity"
 	"github.com/go-playground/validator/v10"
 )
 
 // สร้างอินสแตนซ์ของตัวตรวจสอบ
 var validate = validator.New()
+
+func Login(c *gin.Context) {
+	var loginRequest struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	// Bind JSON request body to loginRequest struct
+	if err := c.ShouldBindJSON(&loginRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	db := config.DB()
+
+	// Find user by username
+	var user entity.User
+	if err := db.Where("username = ?", loginRequest.Username).First(&user).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+		return
+	}
+
+	// Check password
+	if !config.CheckPasswordHash([]byte(loginRequest.Password), []byte(user.Password)) {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+        return
+    }
+
+	c.JSON(http.StatusOK, gin.H{"message": "Login successful"})
+}
 
 // POST /users
 func CreateUser(c *gin.Context) {
@@ -44,7 +74,7 @@ func CreateUser(c *gin.Context) {
 		Email:     user.Email,
 		Password:  hashedPassword,
 		Birthday:  user.Birthday,
-		RoleID:    user.RoleID,
+		UserRoleID:  user.UserRoleID, // ตรวจสอบชื่อฟิลด์นี้ในโมเดล User
 	}
 
 	// บันทึก

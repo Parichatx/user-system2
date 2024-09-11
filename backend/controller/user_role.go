@@ -4,14 +4,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"user-system/backend/config"     
-    "user-system/backend/entity" 
+	"github.com/Parichatx/user-system2/config"
+	"github.com/Parichatx/user-system2/entity"
 	
 )
 
 // GET /UserRole
 func ListUserRoles(c *gin.Context) {
-	var user_role []entity.User_Role
+	var user_role []entity.UserRole
 
 	db := config.DB()
 

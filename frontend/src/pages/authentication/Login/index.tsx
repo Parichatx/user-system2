@@ -10,8 +10,9 @@ function SignInPages() {
   const [messageApi, contextHolder] = message.useMessage();
 
   const onFinish = async (values: SignInInterface) => {
+    console.log(values)
     let res = await SignIn(values);
-
+    console.log(res)
     if (res.status === 200) {
       messageApi.success("Sign-in successful");
       localStorage.setItem("isLogin", "true");
