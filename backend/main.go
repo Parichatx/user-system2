@@ -11,9 +11,9 @@ import (
 
    "github.com/Parichatx/user-system2/config"
 
-   "github.com/Parichatx/user-system2/controller"
-
    "github.com/Parichatx/user-system2/middlewares"
+
+	"github.com/Parichatx/user-system2/controller/user"
 
 )
 
@@ -41,9 +41,9 @@ func main() {
  
 	// Auth Route
  
-	r.POST("/signup", users.SignUp)
+	r.POST("/signup", user.SignUp)
  
-	r.POST("/signin", users.SignIn)
+	r.POST("/signin", user.SignIn)
  
  
 	router := r.Group("/")
@@ -55,19 +55,18 @@ func main() {
  
 		// User Route
  
-		router.PUT("/user/:id", users.Update)
+		router.PUT("/user/:id", user.Update)
  
-		router.GET("/users", users.GetAll)
+		router.GET("/users", user.GetAll)
  
-		router.GET("/user/:id", users.Get)
+		router.GET("/user/:id", user.Get)
  
-		router.DELETE("/user/:id", users.Delete)
+		router.DELETE("/user/:id", user.Delete)
  
  
 	}
  
  
-	r.GET("/genders", genders.GetAll)
  
  
 	r.GET("/", func(c *gin.Context) {

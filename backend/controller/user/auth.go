@@ -19,7 +19,7 @@ import (
 
    "github.com/Parichatx/user-system2/config"
 	"github.com/Parichatx/user-system2/entity"
-	"github.com/Parichatx/user-system2/service"
+	"github.com/Parichatx/user-system2/services"
 
 
 )
@@ -29,7 +29,7 @@ type (
 
    Authen struct {
 
-       Email    string `json:"email"`
+       Username    string `json:"username"`
 
        Password string `json:"password"`
 
@@ -44,13 +44,12 @@ type (
 
        Email     string    `json:"email"`
 
-       Age       uint8     `json:"age"`
+        Username string `json:"username"`
 
        Password  string    `json:"password"`
 
-       BirthDay  time.Time `json:"birthday"`
+       Birthday  time.Time `json:"birthday"`
 
-       GenderID  uint      `json:"gender_id"`
 
    }
 
@@ -75,7 +74,7 @@ func SignUp(c *gin.Context) {
 
    db := config.DB()
 
-   var userCheck entity.Users
+   var userCheck entity.User
 
 
    // Check if the user with the provided email already exists
@@ -111,7 +110,7 @@ func SignUp(c *gin.Context) {
 
    // Create a new user
 
-   user := entity.Users{
+   user := entity.User{
 
        FirstName: payload.FirstName,
 
@@ -119,13 +118,9 @@ func SignUp(c *gin.Context) {
 
        Email:     payload.Email,
 
-       Age:       payload.Age,
-
        Password:  hashedPassword,
 
-       BirthDay:  payload.BirthDay,
-
-       GenderID:  payload.GenderID,
+       Birthday:  payload.Birthday,
 
    }
 
@@ -150,7 +145,7 @@ func SignIn(c *gin.Context) {
 
    var payload Authen
 
-   var user entity.Users
+   var user entity.User
 
 
    if err := c.ShouldBindJSON(&payload); err != nil {
@@ -163,7 +158,7 @@ func SignIn(c *gin.Context) {
 
    // ค้นหา user ด้วย Username ที่ผู้ใช้กรอกเข้ามา
 
-   if err := config.DB().Raw("SELECT * FROM users WHERE email = ?", payload.Email).Scan(&user).Error; err != nil {
+   if err := config.DB().Raw("SELECT * FROM users WHERE username = ?", payload.Username).Scan(&user).Error; err != nil {
 
        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 
