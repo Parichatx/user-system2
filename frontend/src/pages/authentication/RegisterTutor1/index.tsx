@@ -1,18 +1,6 @@
-import {
-  Button,
-  Card,
-  Form,
-  Input,
-  message,
-  Row,
-  Col,
-  DatePicker
-} from "antd";
-
+import { Button, Card, Form, Input, message, Row, Col, DatePicker, Select } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-
-import { useNavigate } from "react-router-dom";
-
+import { useNavigate, useLocation } from "react-router-dom";
 import { CreateUser } from "../../../services/https";
 import { UsersInterface } from "../../../interfaces/IUser";
 import logo1 from "../../../assets/logo1.png";
@@ -20,8 +8,12 @@ import logo1 from "../../../assets/logo1.png";
 function SignUpTutor1Pages() {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
+  const location = useLocation();
+  const { UserRoleID } = location.state || {}; // ดึง UserRoleID จาก state
 
   const onFinish = async (values: UsersInterface) => {
+    values.UserRoleID = UserRoleID;
+
     let res = await CreateUser(values);
 
     if (res.status === 201) {
@@ -30,7 +22,6 @@ function SignUpTutor1Pages() {
         content: res.data.message,
       });
 
-      // Navigate to /tutorsignup2 after successful submission
       setTimeout(() => {
         navigate("/tutorsignup2");
       }, 2000);
@@ -82,7 +73,7 @@ function SignUpTutor1Pages() {
             paddingRight: "50px",
           }}
         >
-          <Card className="card-login" style={{ width: "100%", height: "100%", border: "none" }}>
+          <Card className="card-login" style={{ width: "100%", height: "100%", border: "none" , padding:"30px"}}>
             <Button
               type="link"
               onClick={() => navigate(-1)}
@@ -92,7 +83,7 @@ function SignUpTutor1Pages() {
             </Button>
             <Row align={"middle"} justify={"center"}>
               <Col xs={24} sm={20} md={20} lg={20} xl={20}>
-                <h2 className="header" style={{ marginBottom: "50px" }}>
+                <h2 className="header" style={{ marginBottom: "50px",textAlign:'center' }}>
                   Tutor Account Sign Up
                 </h2>
 
@@ -221,6 +212,28 @@ function SignUpTutor1Pages() {
                       </Form.Item>
                     </Col>
 
+                    {/* เพิ่มฟิลด์สำหรับเลือกเพศ */}
+                    <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                      <Form.Item
+                        label="เพศ"
+                        name="gender"
+                        rules={[
+                          {
+                            required: true,
+                            message: "กรุณาเลือกเพศ !",
+                          },
+                        ]}
+                      >
+                        <Select
+                          placeholder="กรุณาเลือกเพศ"
+                          options={[
+                            { value: "male", label: "ชาย" },
+                            { value: "female", label: "หญิง" },
+                          ]}
+                        />
+                      </Form.Item>
+                    </Col>
+
                     <Col xs={24} sm={24} md={24} lg={24} xl={24}>
                       <Form.Item>
                         <Button
@@ -228,7 +241,6 @@ function SignUpTutor1Pages() {
                           htmlType="submit"
                           className="login-form-button"
                           style={{ marginBottom: 20 }}
-                          onClick={() => navigate("/tutorsignup2")}
                         >
                           ถัดไป
                         </Button>

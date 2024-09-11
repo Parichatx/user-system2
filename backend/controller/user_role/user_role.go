@@ -11,7 +11,8 @@ import (
 
 // GET /UserRole
 func ListUserRoles(c *gin.Context) {
-	var user_role []entity.UserRole
+
+	var user_role []entity.UserRoles
 
 	db := config.DB()
 

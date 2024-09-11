@@ -1,6 +1,6 @@
 import { lazy } from "react";
 import React from "react";
-import { RouteObject } from "react-router-dom";
+import { RouteObject, Navigate } from "react-router-dom";
 import MinimalLayout from "../layout/MinimalLayout";
 import Loadable from "../components/third-patry/Loadable";
 
@@ -10,66 +10,33 @@ const StudentSignup = Loadable(lazy(() => import("../pages/authentication/Regist
 const TutorSignup1 = Loadable(lazy(() => import("../pages/authentication/RegisterTutor1")));
 const TutorSignup2 = Loadable(lazy(() => import("../pages/authentication/RegisterTutor2")));
 
-const ProfileUser = Loadable(lazy(() => import("../pages/User")));
-const EditUser = Loadable(lazy(() => import("../pages/User/edit")));
-const ChangePassword = Loadable(lazy(() => import("../pages/User/changepassword")));
-
-const TutorProfile = Loadable(lazy(() => import("../pages/TutorProfile")));
-const EditTutor = Loadable(lazy(() => import("../pages/TutorProfile/edit")));
-
-
 const MainRoutes = (): RouteObject => {
+  const isLoggedIn = !!localStorage.getItem("user"); // ตรวจสอบการล็อกอินจาก localStorage
+
   return {
     path: "/",
     element: <MinimalLayout />,
     children: [
       {
         path: "/",
-        element: <MainPages />,
+        element: isLoggedIn ? <Navigate to="/profileuser" /> : <MainPages />,
       },
       {
         path: "/signupselect",
-        element: <RegisterSelect />,
+        element: isLoggedIn ? <Navigate to="/profileuser" /> : <RegisterSelect />,
       },
       {
         path: "/studentsignup",
-        element: <StudentSignup />,
+        element: isLoggedIn ? <Navigate to="/profileuser" /> : <StudentSignup />,
       },
       {
         path: "/tutorsignup1",
-        element: <TutorSignup1 />,
+        element: isLoggedIn ? <Navigate to="/profileuser" /> : <TutorSignup1 />,
       },
       {
         path: "/tutorsignup2",
-        element: <TutorSignup2 />,
+        element: isLoggedIn ? <Navigate to="/profileuser" /> : <TutorSignup2 />,
       },
-
-
-      {
-        path: "/profileuser",
-        element: <ProfileUser />,
-      },
-
-      {
-        path: "/edituser",
-        element: <EditUser />,
-      },
-      {
-        path: "/changepassword",
-        element: <ChangePassword />,
-      },
-
-      {
-        path: "/tutorprofile",
-        element: <TutorProfile />,
-      },
-
-      {
-        path: "/edittutor",
-        element: <EditTutor />,
-      },
-
-
       {
         path: "*",
         element: <MainPages />,

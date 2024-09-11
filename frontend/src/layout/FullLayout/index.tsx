@@ -12,9 +12,11 @@ import logo from "../../assets/logo.png";
 
 import Dashboard from "../../pages/dashboard";
 
-import ProfileUser from "../../pages/User";
+import Customer from "../../pages/customer";
 
-import EditUser from "../../pages/User/edit";
+import CustomerCreate from "../../pages/customer/create";
+
+import CustomerEdit from "../../pages/customer/edit";
 
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -152,13 +154,13 @@ const FullLayout: React.FC = () => {
 
               <Menu.Item
 
-                key="user"
+                key="customer"
 
-                onClick={() => setCurrentPage("user")}
+                onClick={() => setCurrentPage("customer")}
 
               >
 
-                <Link to="/user">
+                <Link to="/customer">
 
                   <UserOutlined />
 
@@ -210,10 +212,11 @@ const FullLayout: React.FC = () => {
 
               <Route path="/" element={<Dashboard />} />
 
-              <Route path="/user" element={<ProfileUser />} />
+              <Route path="/customer" element={<Customer />} />
 
+              <Route path="/customer/create" element={<CustomerCreate />} />
 
-              <Route path="/user/edit/:id" element={<EditUser />} />
+              <Route path="/customer/edit/:id" element={<CustomerEdit />} />
 
             </Routes>
 

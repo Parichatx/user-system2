@@ -11,7 +11,7 @@ import (
 
 // POST /tutor-profile
 func CreateTutorProfile(c *gin.Context) {
-	var tutorProfile entity.TutorProfile
+	var tutorProfile entity.TutorProfiles
 
 	// bind ข้อมูลที่รับมาเป็น JSON เข้าตัวแปร tutorProfile
 	if err := c.ShouldBindJSON(&tutorProfile); err != nil {
@@ -22,7 +22,7 @@ func CreateTutorProfile(c *gin.Context) {
 	db := config.DB()
 
 	// ตรวจสอบว่าผู้ใช้มีอยู่ในฐานข้อมูลหรือไม่
-	var user entity.User
+	var user entity.Users
 	if err := db.First(&user, tutorProfile.UserID).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "User not found"})
 		return
@@ -40,7 +40,7 @@ func CreateTutorProfile(c *gin.Context) {
 // GET /tutor-profile/:id
 func GetTutorProfile(c *gin.Context) {
 	ID := c.Param("id")
-	var tutorProfile entity.TutorProfile
+	var tutorProfile entity.TutorProfiles
 
 	db := config.DB()
 	results := db.Preload("User").First(&tutorProfile, ID) // Preload User
@@ -53,7 +53,7 @@ func GetTutorProfile(c *gin.Context) {
 
 // GET /tutor-profiles
 func ListTutorProfiles(c *gin.Context) {
-	var tutorProfiles []entity.TutorProfile
+	var tutorProfiles []entity.TutorProfiles
 
 	db := config.DB()
 	results := db.Preload("User").Find(&tutorProfiles) // Preload User
@@ -66,7 +66,7 @@ func ListTutorProfiles(c *gin.Context) {
 
 // PATCH /tutor-profile/:id
 func UpdateTutorProfile(c *gin.Context) {
-	var tutorProfile entity.TutorProfile
+	var tutorProfile entity.TutorProfiles
 
 	TutorProfileID := c.Param("id")
 
@@ -83,7 +83,7 @@ func UpdateTutorProfile(c *gin.Context) {
 	}
 
 	// ตรวจสอบว่าผู้ใช้ที่เชื่อมโยงมีอยู่หรือไม่
-	var user entity.User
+	var user entity.Users
 	if err := db.First(&user, tutorProfile.UserID).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "User not found"})
 		return

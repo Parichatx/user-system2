@@ -1,4 +1,4 @@
-package user
+package users
 
 
 import (
@@ -31,7 +31,7 @@ type (
 
        Username    string `json:"username"`
 
-       Password string `json:"password"`
+       Password    string `json:"password"`
 
    }
 
@@ -50,7 +50,9 @@ type (
 
        Birthday  time.Time `json:"birthday"`
 
+       Profile   string `gorm:"type:longtext"`
 
+        GenderID  uint      `json:"gender_id"`
    }
 
 )
@@ -74,12 +76,12 @@ func SignUp(c *gin.Context) {
 
    db := config.DB()
 
-   var userCheck entity.User
+   var userCheck entity.Users
 
 
    // Check if the user with the provided email already exists
 
-   result := db.Where("email = ?", payload.Email).First(&userCheck)
+   result := db.Where("username = ?", payload.Username).First(&userCheck)
 
    if result.Error != nil && !errors.Is(result.Error, gorm.ErrRecordNotFound) {
 
@@ -110,7 +112,7 @@ func SignUp(c *gin.Context) {
 
    // Create a new user
 
-   user := entity.User{
+   user := entity.Users{
 
        FirstName: payload.FirstName,
 
@@ -118,9 +120,15 @@ func SignUp(c *gin.Context) {
 
        Email:     payload.Email,
 
+       Username: payload.Username,
+
        Password:  hashedPassword,
 
        Birthday:  payload.Birthday,
+
+       GenderID:  payload.GenderID,
+
+       Profile: payload.Profile,
 
    }
 
@@ -145,7 +153,7 @@ func SignIn(c *gin.Context) {
 
    var payload Authen
 
-   var user entity.User
+   var user entity.Users
 
 
    if err := c.ShouldBindJSON(&payload); err != nil {
@@ -191,7 +199,7 @@ func SignIn(c *gin.Context) {
    }
 
 
-   signedToken, err := jwtWrapper.GenerateToken(user.Email)
+   signedToken, err := jwtWrapper.GenerateToken(user.Username)
 
    if err != nil {
 

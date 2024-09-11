@@ -12,7 +12,7 @@ import (
 
 // POST /login-history
 func CreateLoginHistory(c *gin.Context) {
-	var loginHistory entity.LoginHistory
+	var loginHistory entity.LoginHistories
 
 	// bind ข้อมูลที่รับมาเป็น JSON เข้าตัวแปร loginHistory
 	if err := c.ShouldBindJSON(&loginHistory); err != nil {
@@ -37,7 +37,7 @@ func CreateLoginHistory(c *gin.Context) {
 // GET /login-history/:id
 func GetLoginHistory(c *gin.Context) {
 	ID := c.Param("id")
-	var loginHistory entity.LoginHistory
+	var loginHistory entity.LoginHistories
 
 	db := config.DB()
 	results := db.First(&loginHistory, ID)
@@ -51,7 +51,7 @@ func GetLoginHistory(c *gin.Context) {
 // GET /login-history/user/:user_id
 func ListUserLoginHistory(c *gin.Context) {
 	userID := c.Param("user_id")
-	var loginHistories []entity.LoginHistory
+	var loginHistories []entity.LoginHistories
 
 	db := config.DB()
 	results := db.Where("user_id = ?", userID).Find(&loginHistories)

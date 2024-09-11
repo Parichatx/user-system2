@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { Layout, Avatar, ConfigProvider, MenuProps } from 'antd';
-import { BookOutlined, UserOutlined, ShoppingCartOutlined } from '@ant-design/icons';
+import { Layout, Avatar, ConfigProvider, MenuProps, Menu, message } from 'antd';
+import { BookOutlined, UserOutlined, ShoppingCartOutlined, LogoutOutlined } from '@ant-design/icons';
 import Logo from '../../assets/logo1.png';
-import { Link } from 'react-router-dom';
-import { Menu } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
 import 'antd/dist/reset.css';
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -24,7 +23,6 @@ const items: MenuItem[] = [
     key: 'tutorProfile',
     icon: <BookOutlined />,
   },
-  
 ];
 
 const { Header } = Layout;
@@ -32,11 +30,24 @@ const { Header } = Layout;
 function HeaderTutor() {
 
   const [current, setCurrent] = useState("course");
+  const navigate = useNavigate();
 
   const onClick: MenuProps['onClick'] = (e) => {
     console.log('click ', e);
     setCurrent(e.key);
+
+    if (e.key === 'logout') {
+      // การกระทำการ logout ที่นี่
+      localStorage.clear(); // ลบข้อมูลทั้งหมดจาก localStorage
+
+      message.success("Logout successful");
+
+      setTimeout(() => {
+        navigate('/login'); // เปลี่ยนเส้นทางไปยังหน้า login
+      }, 2000);
+    }
   };
+
   return (
     <Header
       style={{
@@ -103,7 +114,7 @@ function HeaderTutor() {
           alignItems: 'center',
           justifyContent: 'flex-end',
           height: '100%',
-          width:'200px',
+          width:'auto',
           maxWidth:'200px',
           gap: '10px',
         }}
@@ -112,14 +123,36 @@ function HeaderTutor() {
           style={{
             color: '#f0f0f0',
             fontSize: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
           }}
-        ><Link to="/profileuser">
-          EyeEyes
+        >
+          <Link to="/profileuser">
+            EyeEyes
           </Link>
         </div>
         
-            <Avatar size={45} icon={<UserOutlined />} />
-       
+        <Avatar size={45} icon={<UserOutlined />} />
+
+        <Menu
+          onClick={onClick}
+          mode="horizontal"
+          items={[
+            {
+              label: 'ออกจากระบบ',
+              key: 'logout',
+              icon: <LogoutOutlined />,
+            }
+          ]}
+          style={{
+            backgroundColor: 'transparent',
+            border: 'none',
+            color: '#f0f0f0',
+            display: 'inline-block',
+            marginLeft: '10px',
+          }}
+        />
       </div>
     </Header>
   );

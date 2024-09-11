@@ -108,13 +108,13 @@ function ProfileUser() {
             >
               <Button
                 style={{ width: '60%', justifyContent: 'left', marginBottom: '20px' }}
-                onClick={() => navigate('/edituser')}
+                onClick={() => navigate('/user/edit/:id')}
               >
                 <EditOutlined /> แก้ไขข้อมูลผู้ใช้
               </Button>
               <Button
                 style={{ width: '60%', justifyContent: 'left' }}
-                onClick={() => navigate('/changepassword')}
+                onClick={() => navigate('/user/changepassword/:id')}
               >
                 <LockOutlined /> เปลี่ยนรหัสผ่าน
               </Button>

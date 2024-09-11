@@ -1,4 +1,4 @@
-package user
+package users
 
 import (
 	"net/http"
@@ -14,12 +14,12 @@ var validate = validator.New()
 func GetAll(c *gin.Context) {
 
 
-	var users []entity.User
+	var users []entity.Users
  
  
 	db := config.DB()
  
-	results := db.Preload("Gender").Find(&users)
+	results := db.Preload("Gender").Preload("UserRole").Find(&users)
  
 	if results.Error != nil {
  
@@ -40,12 +40,12 @@ func GetAll(c *gin.Context) {
  
 	ID := c.Param("id")
  
-	var user entity.User
+	var user entity.Users
  
  
 	db := config.DB()
  
-	results := db.Preload("Gender").First(&user, ID)
+	results := db.Preload("Gender").Preload("UserRole").First(&user, ID)
  
 	if results.Error != nil {
  
@@ -72,7 +72,7 @@ func GetAll(c *gin.Context) {
  func Update(c *gin.Context) {
  
  
-	var user entity.User
+	var user entity.Users
  
  
 	UserID := c.Param("id")

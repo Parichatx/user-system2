@@ -6,11 +6,11 @@ import (
 	
 )
 
-type CourseCategory struct {
+type CourseCategories struct {
 	gorm.Model
 	CategoryName string
 
 	// 1 Category มีได้หลาย Course
-	Courses []Course `gorm:"foreignKey:CourseCategoryID"`
+	Courses []Courses `gorm:"foreignKey:CourseCategoryID"`
 	
 }

@@ -3,7 +3,7 @@ package entity
 import("gorm.io/gorm"
 	) 
 
-type Course struct {
+type Courses struct {
 	gorm.Model
 	Title string
 	ProfilePicture []byte
@@ -16,15 +16,15 @@ type Course struct {
 
 	// UserId ทำหน้าที่เป็น FK
 	TutorProfileID *uint
-	TutorProfile   TutorProfile `gorm:"foreignKey:TutorProfileID"`
+	TutorProfile   TutorProfiles `gorm:"foreignKey:TutorProfileID"`
 
 	// CourseCategoryID ทำหน้าที่เป็น FK
 	CourseCategoryID *uint
-	CourseCategory   CourseCategory `gorm:"foreignKey:CourseCategoryID"`
+	CourseCategory   CourseCategories `gorm:"foreignKey:CourseCategoryID"`
 
 	// 1 course สามารถมีหลาย review
-	Reviews []Review `gorm:"foreignKey:CourseID"`
+	Reviews []Reviews `gorm:"foreignKey:CourseID"`
 
 	// 1 course สามารถมีหลาย payment
-	Payments []Payment `gorm:"foreignKey:CourseID"`
+	Payments []Payments `gorm:"foreignKey:CourseID"`
 }

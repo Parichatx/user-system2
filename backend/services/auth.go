@@ -30,7 +30,7 @@ type JwtWrapper struct {
 
 type JwtClaim struct {
 
-   Email string
+   Username string
 
    jwt.StandardClaims
 
@@ -39,11 +39,11 @@ type JwtClaim struct {
 
 // Generate Token generates a jwt token
 
-func (j *JwtWrapper) GenerateToken(email string) (signedToken string, err error) {
+func (j *JwtWrapper) GenerateToken(username string) (signedToken string, err error) {
 
    claims := &JwtClaim{
 
-       Email: email,
+       Username: username,
 
        StandardClaims: jwt.StandardClaims{
 

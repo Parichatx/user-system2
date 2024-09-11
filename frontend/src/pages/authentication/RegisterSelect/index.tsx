@@ -42,7 +42,7 @@ function SignUpSelectPages() {
                   src={tutorpic}
                   className="pic1"
                 />
-                <Button type="primary" className="select-form-button" style={{ marginBottom: 20 }} onClick={() => navigate("/tutorsignup1")}>
+                <Button type="primary" className="select-form-button" style={{ marginBottom: 20 }} onClick={() => navigate("/tutorsignup1" , { state: { UserRoleID: 2 } })}>
                   Tutor
                 </Button>
               </Col>
@@ -53,7 +53,7 @@ function SignUpSelectPages() {
                   src={studentpic}
                   className="pic1"
                 />
-                <Button type="primary" className="select-form-button" style={{ marginBottom: 20 }} onClick={() => navigate("/studentsignup")}>
+                <Button type="primary" className="select-form-button" style={{ marginBottom: 20 }} onClick={() => navigate("/studentsignup", { state: { UserRoleID: 3 } })} >
                   Student
                 </Button>
               </Col>

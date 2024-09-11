@@ -13,7 +13,7 @@ import (
 
    "github.com/Parichatx/user-system2/middlewares"
 
-	"github.com/Parichatx/user-system2/controller/user"
+	"github.com/Parichatx/user-system2/controller/users"
 
 )
 
@@ -41,9 +41,9 @@ func main() {
  
 	// Auth Route
  
-	r.POST("/signup", user.SignUp)
+	r.POST("/signup", users.SignUp)
  
-	r.POST("/signin", user.SignIn)
+	r.POST("/signin", users.SignIn)
  
  
 	router := r.Group("/")
@@ -55,13 +55,13 @@ func main() {
  
 		// User Route
  
-		router.PUT("/user/:id", user.Update)
+		router.PUT("/user/:id", users.Update)
  
-		router.GET("/users", user.GetAll)
+		router.GET("/users", users.GetAll)
  
-		router.GET("/user/:id", user.Get)
+		router.GET("/user/:id", users.Get)
  
-		router.DELETE("/user/:id", user.Delete)
+		router.DELETE("/user/:id", users.Delete)
  
  
 	}

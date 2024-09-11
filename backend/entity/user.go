@@ -6,28 +6,36 @@ import (
 	"gorm.io/gorm"
 )
 
-type User struct {
+type Users struct {
 	gorm.Model
-	Username  string
-	Password  string
-	Email     string
-	FirstName string
-	LastName  string
-	Birthday  time.Time
+	Username  string	`json:"username"`
+	Password  string	`json:"-"`
+	Email     string	`json:"email"`
+	FirstName string    `json:"first_name"`
+   	LastName  string    `json:"last_name"`
+	Birthday  time.Time	`json:"birthday"`
+	Profile   string 	`gorm:"type:longtext"`
 
 	// UserRoleID ทำหน้าที่เป็น FK
-	UserRoleID *uint
-	UserRole   UserRole `gorm:"foreignKey:UserRoleID"`
+	UserRoleID uint `json:"user_role_id"`
+	UserRole   *UserRoles `gorm:"foreignKey: user_role_id" json:"user_role"`
+
+	// GenderID ทำหน้าที่เป็น FK
+	GenderID  uint      `json:"gender_id"`
+   	Gender    *Genders  `gorm:"foreignKey: gender_id" json:"gender"`
 
 	// 1 user สามารถมีหลาย login history
-	LoginHistories []LoginHistory `gorm:"foreignKey:UserID"`
+	LoginHistories []LoginHistories `gorm:"foreignKey:UserID"`
 
 	// 1 user สามารถมีได้ 1 TutorProfile 
-	TutorProfile  *TutorProfile  `gorm:"foreignKey:UserID"`
+	TutorProfile  *TutorProfiles  `gorm:"foreignKey:UserID"`
 
 	// 1 user สามารถมีหลาย payment
-	Payments []Payment `gorm:"foreignKey:UserID"`
+	Payments []Payments `gorm:"foreignKey:UserID"`
 
 	// 1 user สามารถมีหลาย review
-	Reviews []Review `gorm:"foreignKey:UserID"`
+	Reviews []Reviews `gorm:"foreignKey:UserID"`
+
+	// 1 user สามารถมีได้หลาย task
+	Task []Tasks `gorm:"foreignKey:UserID"`
 }
