@@ -9,12 +9,12 @@ import (
 type Users struct {
 	gorm.Model
 	Username  string	`json:"username"`
-	Password  string	`json:"-"`
+	Password  string	`json:"password"`
 	Email     string	`json:"email"`
 	FirstName string    `json:"first_name"`
    	LastName  string    `json:"last_name"`
 	Birthday  time.Time	`json:"birthday"`
-	Profile   string 	`gorm:"type:longtext"`
+	Profile   string 	`json:"profile" gorm:"type:longtext"`
 
 	// UserRoleID ทำหน้าที่เป็น FK
 	UserRoleID uint `json:"user_role_id"`

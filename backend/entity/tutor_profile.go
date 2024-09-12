@@ -8,9 +8,9 @@ import (
 
 type TutorProfiles struct {
 	gorm.Model
-	Bio  string
-	Experience  string
-	Education     string
+	Bio  string `json:"bio"`
+	Experience  string `json:"experience"`
+	Education     string `json:"education,omitempty"`
 
 	// UserId ทำหน้าที่เป็น FK
 	UserID *uint
