@@ -1,28 +1,22 @@
-import {
-  Button,
-  Card,
-  Form,
-  Input,
-  message,
-  Row,
-  Col,
-  Upload,
-} from "antd";
+import { Button, Card, Form, Input, message, Row, Col, Upload } from "antd";
 import React, { useState } from "react";
 import { ArrowLeftOutlined, PlusOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
-import { CreateUser } from "../../../services/https";
-import { UsersInterface } from "../../../interfaces/IUser";
-import type { GetProp, UploadFile, UploadProps } from "antd";
+import { useNavigate, useLocation } from "react-router-dom";
+import { CreateUser } from "../../../services/https"; // เรียกใช้ API สำหรับสร้างผู้ใช้
 import ImgCrop from "antd-img-crop";
+import type { UploadFile, UploadProps } from "antd";
 import logo1 from "../../../assets/logo1.png";
 
-type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
+type FileType = Parameters<UploadProps["beforeUpload"]>[0];
 
 function SignUpTutor2Pages() {
   const navigate = useNavigate();
-  const [messageApi, contextHolder] = message.useMessage();
+  const location = useLocation();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [messageApi, contextHolder] = message.useMessage(); // ใช้ message เพื่อแสดงผลข้อความ
+  
+  // รับข้อมูลจากหน้าที่หนึ่ง
+  const initialValues = location.state || {};
 
   const onChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
     setFileList(newFileList);
@@ -43,25 +37,44 @@ function SignUpTutor2Pages() {
     imgWindow?.document.write(image.outerHTML);
   };
 
-  const onFinish = async (values: UsersInterface) => {
-    let res = await CreateUser(values);
-
-    if (res.status === 201) {
-      messageApi.open({
-        type: "success",
-        content: res.data.message,
-      });
-
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
-    } else {
-      messageApi.open({
-        type: "error",
-        content: res.data.error,
-      });
+  const onFinish = async (values: any) => {
+    const formData = new FormData(); // ใช้ FormData เพื่อแนบไฟล์ภาพ
+  
+    // ข้อมูลสำหรับตาราง Users
+    formData.append("first_name", initialValues.first_name);
+    formData.append("last_name", initialValues.last_name);
+    formData.append("email", initialValues.email);
+    formData.append("birthday", initialValues.birthday);
+    formData.append("username", initialValues.username);
+    formData.append("password", initialValues.password);
+    formData.append("gender_id", initialValues.gender);
+  
+    // ข้อมูลสำหรับตาราง TutorProfiles
+    formData.append("education", values.education);
+    formData.append("experience", values.experience);
+    formData.append("bio", values.bio);
+  
+    // ตรวจสอบว่ามีรูปภาพที่ผู้ใช้อัพโหลดหรือไม่
+    if (fileList.length > 0) {
+      formData.append("profile_picture", fileList[0].originFileObj as File);
+    }
+  
+    try {
+      const response = await CreateUser(formData); // เรียก API สร้างผู้ใช้
+      
+      // ตรวจสอบสถานะการตอบกลับของ API
+      if (response && response.status === 200) {
+        messageApi.success("สมัครสมาชิกสำเร็จ"); // แสดงข้อความสำเร็จ
+        navigate("/login"); // ไปยังหน้าเข้าสู่ระบบ
+      } else {
+        throw new Error("ไม่สามารถสมัครสมาชิกได้");
+      }
+    } catch (error) {
+      console.error(error);
+      messageApi.error("การสมัครไม่สำเร็จ"); // แสดงข้อความข้อผิดพลาด
     }
   };
+  
 
   return (
     <>
@@ -79,6 +92,7 @@ function SignUpTutor2Pages() {
             justifyContent: "center",
             alignItems: "center",
             flexDirection: "column",
+            position: "relative",
           }}
         >
           <img
@@ -97,54 +111,69 @@ function SignUpTutor2Pages() {
           xl={20}
           style={{
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "flex-end",
             alignItems: "center",
+            paddingRight: "50px",
           }}
         >
-          <Card
-            className="card-login"
-            style={{
-              width: "100%",
-              height: "100%",
-              border: "none",
-              padding: "20px",
-            }}
-          >
+          <Card className="card-login" style={{ width: "100%", height: "100%", border: "none", padding: "30px" }}>
             <Button
               type="link"
               onClick={() => navigate(-1)}
-              style={{
-                position: "absolute",
-                top: "10px",
-                left: "10px",
-                fontSize: "16px",
-              }}
+              style={{ position: "absolute", top: "10px", left: "10px", fontSize: "16px" }}
             >
               <ArrowLeftOutlined /> ย้อนกลับ
             </Button>
-            <Row
-              align={"middle"}
-              justify={"center"}
-              style={{ marginBottom: "30px" }}
-            >
-              <Col xs={24} style={{ textAlign: "center" }}>
-                <h2 className="header" style={{ marginBottom: "30px" }}>
-                  Tutor Account Sign Up
+            <Row align={"middle"} justify={"center"}>
+              <Col xs={24} sm={20} md={20} lg={20} xl={20}>
+                <h2 className="header" style={{ marginBottom: "50px", textAlign: "center" }}>
+                  Tutor Account Sign Up (Step 2)
                 </h2>
-              </Col>
-              <Col xs={24} style={{ textAlign: "center" }}>
-                <Form
-                  name="basic"
-                  layout="vertical"
-                  onFinish={onFinish}
-                  autoComplete="off"
-                >
-                  <Row gutter={[16, 24]} justify="center">
-                    <Col xs={24} sm={12} md={8} lg={6} xl={4}>
+
+                <Form name="basic" layout="vertical" onFinish={onFinish} autoComplete="off">
+                  <Row gutter={[16, 0]} align={"middle"}>
+                    <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                       <Form.Item
-                        label="รูปประจำตัว"
-                        name="profilePicture"
+                        label="Education"
+                        name="education"
+                        rules={[{ required: true, message: "กรุณากรอกข้อมูลการศึกษา !" }]}
+                      >
+                        <Input placeholder="Bachelor's in..." />
+                      </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                      <Form.Item
+                        label="Experience"
+                        name="experience"
+                        rules={[{ required: true, message: "กรุณากรอกข้อมูลประสบการณ์ !" }]}
+                      >
+                        <Input placeholder="5 years of teaching..." />
+                      </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+                      <Form.Item
+                        label="Bio"
+                        name="bio"
+                        rules={[{ required: true, message: "กรุณากรอกข้อมูลประวัติส่วนตัว !" }]}
+                      >
+                        <Input.TextArea placeholder="Brief bio..." rows={4} />
+                      </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+                      <Form.Item
+                        label="Profile Picture"
+                        name="profile_picture"
                         valuePropName="fileList"
+                        getValueFromEvent={(e: any) => {
+                          if (Array.isArray(e)) {
+                            return e;
+                          }
+                          return e && e.fileList;
+                        }}
+                        rules={[{ required: true, message: "กรุณาอัพโหลดรูปโปรไฟล์ !" }]}
                       >
                         <ImgCrop rotationSlider>
                           <Upload
@@ -152,78 +181,26 @@ function SignUpTutor2Pages() {
                             onChange={onChange}
                             onPreview={onPreview}
                             beforeUpload={(file) => {
-                              setFileList([...fileList, file]);
-                              return false;
+                              setFileList([file]); // Update fileList with the new file
+                              return false; // Prevent auto-upload
                             }}
-                            maxCount={1}
-                            multiple={false}
                             listType="picture-card"
+                            maxCount={1}
                           >
-                            <div>
-                              <PlusOutlined />
-                              <div style={{ marginTop: 8 }}>
-                                คลิกเพื่ออัพโหลด
+                            {fileList.length < 1 && (
+                              <div>
+                                <PlusOutlined /> Upload
                               </div>
-                            </div>
+                            )}
                           </Upload>
                         </ImgCrop>
                       </Form.Item>
                     </Col>
 
                     <Col xs={24} sm={24} md={24} lg={24} xl={24}>
-                      <Form.Item
-                        label="การศึกษา"
-                        name="education"
-                        rules={[
-                          {
-                            required: true,
-                            message: "กรุณากรอกการศึกษา !",
-                          },
-                        ]}
-                      >
-                        <Input.TextArea rows={2} />
-                      </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={24} md={24} lg={24} xl={24}>
-                      <Form.Item
-                        label="ประวัติย่อ"
-                        name="resume"
-                        rules={[
-                          {
-                            required: true,
-                            message: "กรุณากรอกประวัติย่อ !",
-                          },
-                        ]}
-                      >
-                        <Input.TextArea rows={2} />
-                      </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={24} md={24} lg={24} xl={24}>
-                      <Form.Item
-                        label="ประสบการณ์"
-                        name="experience"
-                        rules={[
-                          {
-                            required: true,
-                            message: "กรุณากรอกประสบการณ์ !",
-                          },
-                        ]}
-                      >
-                        <Input.TextArea rows={2} />
-                      </Form.Item>
-                    </Col>
-
-                    <Col xs={24} style={{ marginTop: "30px" }}>
                       <Form.Item>
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          className="login-form-button"
-                          style={{ marginBottom: 20 }}
-                        >
-                          ยืนยัน
+                        <Button type="primary" htmlType="submit" className="login-form-button" style={{ marginBottom: 20 }}>
+                          สมัครสมาชิก
                         </Button>
                       </Form.Item>
                     </Col>

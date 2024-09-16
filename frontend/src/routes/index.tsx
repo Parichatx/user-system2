@@ -1,4 +1,3 @@
-
 import { useRoutes, RouteObject } from "react-router-dom";
 
 import AdminRoutes from "./AdminRoutes";

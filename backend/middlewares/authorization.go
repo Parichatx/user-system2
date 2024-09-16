@@ -1,81 +1,43 @@
 package middlewares
 
-
 import (
+	"net/http"
+	"strings"
 
-   "net/http"
-
-   "strings"
-
-
-   "github.com/Parichatx/user-system2/services"
-
-   "github.com/gin-gonic/gin"
-
+	"github.com/gin-gonic/gin"
+	"github.com/Parichatx/user-system2/services"
 )
 
-
-var HashKey = []byte("very-secret")
-
-var BlockKey = []byte("a-lot-secret1234")
-
-
-// Authorization เป็นฟังก์ชั่นตรวจเช็ค Cookie
-
+// Authorization เป็นฟังก์ชั่นตรวจเช็ค Token
 func Authorizes() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		clientToken := c.GetHeader("Authorization")
 
-   return func(c *gin.Context) {
+		if clientToken == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "No Authorization header provided"})
+			return
+		}
 
-       clientToken := c.Request.Header.Get("Authorization")
+		// Extract token
+		extractedToken := strings.Split(clientToken, "Bearer ")
+		if len(extractedToken) != 2 {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Incorrect Format of Authorization Token"})
+			return
+		}
 
-       if clientToken == "" {
+		clientToken = strings.TrimSpace(extractedToken[1])
 
-           c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "No Authorization header provided"})
+		jwtWrapper := services.JwtWrapper{
+			SecretKey: "SvNQpBN8y3qlVrsGAYYWoJJk56LtzFHx",
+			Issuer:    "AuthService",
+		}
 
-           return
+		_, err := jwtWrapper.ValidateToken(clientToken)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			return
+		}
 
-       }
-
-
-       extractedToken := strings.Split(clientToken, "Bearer ")
-
-
-       if len(extractedToken) == 2 {
-
-           clientToken = strings.TrimSpace(extractedToken[1])
-
-       } else {
-
-           c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Incorrect Format of Authorization Token"})
-
-           return
-
-       }
-
-
-       jwtWrapper := services.JwtWrapper{
-
-           SecretKey: "SvNQpBN8y3qlVrsGAYYWoJJk56LtzFHx",
-
-           Issuer:    "AuthService",
-
-       }
-
-
-       _, err := jwtWrapper.ValidateToken(clientToken)
-
-       if err != nil {
-
-           c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-
-           return
-
-
-       }
-
-       c.Next()
-
-   }
-
-
+		c.Next()
+	}
 }

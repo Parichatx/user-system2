@@ -4,31 +4,60 @@ import { SignIn } from "../../../services/https";
 import { SignInInterface } from "../../../interfaces/SignIn";
 import logo1 from "../../../assets/logo1.png";
 import pic1 from "../../../assets/pic1.png";
+import axios from "axios";
 
 function SignInPages() {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
 
   const onFinish = async (values: SignInInterface) => {
-    console.log(values)
-    let res = await SignIn(values);
-    console.log(res)
-    if (res.status === 200) {
-      messageApi.success("Sign-in successful");
-      localStorage.setItem("isLogin", "true");
-      localStorage.setItem("page", "dashboard");
-      localStorage.setItem("token_type", res.data.token_type);
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("id", res.data.id);
+    try {
+      // ทำการเรียกฟังก์ชัน SignIn
+      const res = await SignIn(values);
+      console.log("Response:", res); // ตรวจสอบโครงสร้างของ response
+  
+      if (res.status === 200) {
+        const userRoleId = res.data.user_role_id; // รับค่า user_role_id จากการตอบกลับ
+        console.log("user_role_id from response:", userRoleId);
+        console.log("id from response:", res.data.id);
+        console.log("username from response:", res.data.username);
 
-      setTimeout(() => {
-        location.href = "/";
-      }, 2000);
-    } else {
-      messageApi.error(res.data.error);
+        // แสดงข้อความสำเร็จ
+        messageApi.success("Sign-in successful");
+  
+        // จัดเก็บข้อมูลลง localStorage
+        // หลังจากล็อกอินสำเร็จ
+
+        localStorage.setItem("isLogin", "true");
+        localStorage.setItem("page", "dashboard");
+        localStorage.setItem("token_type", res.data.token_type);
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("id", res.data.id);
+        localStorage.setItem("user_role_id", userRoleId.toString()); // จัดเก็บ user_role_id
+        localStorage.setItem("username", res.data.username); // จัดเก็บ username
+
+        // เปลี่ยนเส้นทางตาม user_role_id
+        setTimeout(() => {
+          if (userRoleId === 2) {
+            navigate("/"); 
+          } else {
+            navigate("/"); 
+          }
+        }, 2000);
+      } else {
+        // แสดงข้อความข้อผิดพลาดหากการตอบกลับไม่ใช่ 200
+        messageApi.error(res.data.error);
+      }
+    } catch (error) {
+      // จัดการข้อผิดพลาดที่เกิดจากการเรียก SignIn
+      if (axios.isAxiosError(error)) {
+        messageApi.error(error.response ? error.response.data.message : 'An unexpected error occurred');
+      } else {
+        messageApi.error('An unexpected error occurred');
+      }
     }
   };
-
+  
   return (
     <>
       {contextHolder}

@@ -23,6 +23,7 @@ const items: MenuItem[] = [
 const { Header } = Layout;
 
 function HeaderComponent() {
+  const username = localStorage.getItem('username') || 'Unknown User';
   const [current, setCurrent] = useState("course");
   const navigate = useNavigate();
 
@@ -123,7 +124,7 @@ function HeaderComponent() {
           }}
         >
           <Link to="/profileuser">
-            EyeEyes
+            {username}
           </Link>
         </div>
         

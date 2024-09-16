@@ -20,6 +20,4 @@ export interface UsersInterface {
 
     GenderID?: number;
 
-
-     
   }

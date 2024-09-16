@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ArrowLeftOutlined, PlusOutlined } from "@ant-design/icons";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { CreateUser } from "../../../services/https";
 import { UsersInterface } from "../../../interfaces/IUser";
 import logo1 from "../../../assets/logo1.png";
@@ -14,8 +14,6 @@ function SignUpStudentPages() {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const location = useLocation();
-  const { UserRoleID } = location.state || {}; // ดึง UserRoleID จาก state
 
   const onChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
     setFileList(newFileList);
@@ -37,7 +35,6 @@ function SignUpStudentPages() {
   };
 
   const onFinish = async (values: UsersInterface) => {
-    values.UserRoleID = UserRoleID; // ตั้งค่า RoleID ก่อนส่งไปที่ backend
 
     let res = await CreateUser(values);
 
@@ -62,29 +59,14 @@ function SignUpStudentPages() {
     <>
       {contextHolder}
       <Row style={{ height: "100vh", backgroundColor: "#FFFF" }}>
-        <Col
-          xs={24}
-          sm={4}
-          md={4}
-          lg={4}
-          xl={4}
-          style={{
-            backgroundColor: "#333D51",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            flexDirection: "column",
-            position: "relative",
-          }}
-        >
+        <Col xs={24} sm={4} md={4} lg={4} xl={4} style={{ backgroundColor: "#333D51", display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", position: "relative" }}>
           <img
             alt="logo"
-            style={{ width: "50%", marginTop: "-200%" }}
+            style={{ width: "50%" , marginTop: "-200%"}}
             src={logo1}
             className="images-logo"
           />
         </Col>
-
         <Col
           xs={24}
           sm={20}
@@ -99,8 +81,7 @@ function SignUpStudentPages() {
           }}
         >
           <Card
-            className="card-login"
-            style={{ width: 1100, height: "100%", border: "none" , padding: "30px" }}
+            className="card-login" style={{ width: "100%", height: "100%", maxWidth: 1100, border: "none", position: "relative", padding: "20px"}}
           >
             <Button
               type="link"
@@ -244,7 +225,7 @@ function SignUpStudentPages() {
                       </Form.Item>
                     </Col>
 
-                    <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                    <Col xs={24} sm={24} md={24} lg={12} xl={12}>
                       <Form.Item
                         label="เพศ"
                         name="gender_id"
@@ -270,7 +251,7 @@ function SignUpStudentPages() {
                     <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                       <Form.Item
                         label="รูปประจำตัว"
-                        name="profilePicture"
+                        name="profile"
                         valuePropName="fileList"
                       >
                         <ImgCrop rotationSlider>
@@ -297,15 +278,26 @@ function SignUpStudentPages() {
                       </Form.Item>
                     </Col>
 
-                    <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+                   
+                    <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+  <Form.Item
+    label="Role"
+    name="user_role_id"
+    initialValue={3} // This is the value for 'Student'
+    noStyle
+  >
+    <Input type="hidden" value={3} />
+  </Form.Item>
+  <Form.Item label="Role Display">
+    <Input disabled value="This is Student User!" />
+  </Form.Item>
+</Col>
+
+
+                    <Col span={24}>
                       <Form.Item>
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          className="login-form-button"
-                          style={{ marginBottom: 20 }}
-                        >
-                          ยืนยัน
+                        <Button type="primary" htmlType="submit" className="login-from-button" style={{ width: "100%" }}>
+                          สมัครสมาชิก
                         </Button>
                       </Form.Item>
                     </Col>

@@ -3,7 +3,7 @@ import { RouteObject } from "react-router-dom";
 import Loadable from "../components/third-patry/Loadable";
 import MinimalLayout from "../layout/MinimalLayout";
 
-// ลองใช้ Loadable เพื่อลดขนาดของ Bundle
+// Use Loadable to reduce bundle size
 const MainPages = Loadable(lazy(() => import("../pages/authentication/Login")));
 const ProfileUser = Loadable(lazy(() => import("../pages/User")));
 const EditUser = Loadable(lazy(() => import("../pages/User/edit")));
@@ -11,35 +11,29 @@ const ChangePassword = Loadable(lazy(() => import("../pages/User/changepassword"
 const TutorProfile = Loadable(lazy(() => import("../pages/TutorProfile")));
 const EditTutor = Loadable(lazy(() => import("../pages/TutorProfile/edit")));
 
-// สร้าง AdminRoutes ขึ้นอยู่กับสถานะการล็อกอิน
 const AdminRoutes = (isLoggedIn: boolean): RouteObject => {
+  const userRoleId = parseInt(localStorage.getItem("user_role_id") || "0", 10);
+  const id = localStorage.getItem('id') || 'Unknown User';
+
   return {
     path: "/",
     element: <MinimalLayout />, // ใช้ MinimalLayout เป็น Wrapper
     children: [
       {
         path: "/",
-        element: isLoggedIn ? <ProfileUser /> : <MainPages />,
+        element: isLoggedIn ? (userRoleId === 2 ? <TutorProfile /> : <ProfileUser />) : <MainPages />,
       },
       {
-        path: "/user",
-        element: isLoggedIn ? <ProfileUser /> : <MainPages />, // ใช้ ProfileUser เมื่อมีการล็อกอิน
+        path: "/users",
+        element: isLoggedIn ? (userRoleId === 2 ? <TutorProfile /> : <ProfileUser />) : <MainPages />,
         children: [
           {
-            path: "edit/:id", // เส้นทางสำหรับแก้ไขผู้ใช้
-            element: isLoggedIn ? <EditUser /> : <MainPages />,
+            path: "edit/:id",
+            element: isLoggedIn ? (userRoleId === 2 ? <EditTutor /> : <EditUser />) : <MainPages />,
           },
           {
-            path: "changepassword",
+            path: "changepassword/:id",
             element: isLoggedIn ? <ChangePassword /> : <MainPages />,
-          },
-          {
-            path: "tutorprofile",
-            element: isLoggedIn ? <TutorProfile /> : <MainPages />,
-          },
-          {
-            path: "edittutor",
-            element: isLoggedIn ? <EditTutor /> : <MainPages />,
           },
         ],
       },

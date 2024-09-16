@@ -28,8 +28,8 @@ function SignUpSelectPages() {
         />
       </Col>
 
-        <Col xs={24} sm={20} md={20} lg={20} xl={20} style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "0 50px" }}>
-          <Card className="card-login" style={{ width: "100%", height: "100%", maxWidth: 1200, border: "none", position: "relative", padding: "20px" }}>
+        <Col xs={24} sm={20} md={20} lg={20} xl={20} style={{ display: "flex", justifyContent: "center", alignItems: "center", }}>
+          <Card className="card-login" style={{ width: "100%", height: "100%", maxWidth: 1100, border: "none", position: "relative", padding: "20px" }}>
             <Button type="link" onClick={() => navigate(-1)} style={{ position: "absolute", top: "10px", left: "10px", fontSize: "16px" }}>
               <ArrowLeftOutlined /> ย้อนกลับ
             </Button>
@@ -42,7 +42,7 @@ function SignUpSelectPages() {
                   src={tutorpic}
                   className="pic1"
                 />
-                <Button type="primary" className="select-form-button" style={{ marginBottom: 20 }} onClick={() => navigate("/tutorsignup1" , { state: { UserRoleID: 2 } })}>
+                <Button type="primary" className="select-form-button" style={{ marginBottom: 20 }} onClick={() => navigate("/tutorsignup" , )}>
                   Tutor
                 </Button>
               </Col>
@@ -53,7 +53,7 @@ function SignUpSelectPages() {
                   src={studentpic}
                   className="pic1"
                 />
-                <Button type="primary" className="select-form-button" style={{ marginBottom: 20 }} onClick={() => navigate("/studentsignup", { state: { UserRoleID: 3 } })} >
+                <Button type="primary" className="select-form-button" style={{ marginBottom: 20 }} onClick={() => navigate("/studentsignup", )} >
                   Student
                 </Button>
               </Col>

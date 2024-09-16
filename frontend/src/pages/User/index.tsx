@@ -1,51 +1,60 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Col, Form, Row, message, Button } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Card, Col, Row, message, Button } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import HeaderComponent from '../../components/header/index';
 import studentpic from '../../assets/studentpic.png';
 import { LockOutlined, EditOutlined } from '@ant-design/icons';
-import { GetUsersById } from "../../services/https/index";
-import dayjs from 'dayjs';
+import { GetUserById as getUserByIdFromService } from "../../services/https/index";
 
 function ProfileUser() {
   const navigate = useNavigate();
-  const [messageApi, contextHolder] = message.useMessage();
-  const { id } = useParams(); // Assuming you have a route parameter for the user ID
+  const [userData, setUserData] = useState<any>(null); // เก็บข้อมูลผู้ใช้ที่ดึงมา
+  const id = localStorage.getItem("id"); // ดึง id จาก localStorage
+  console.log("id:", id);
 
-  const [form] = Form.useForm();
+  const [messageApi, contextHolder] = message.useMessage();
+
+  // กำหนดค่าจาก localStorage
+  const username = localStorage.getItem('username') || 'Unknown User';
+  const user_role_id = localStorage.getItem('user_role_id') || 'Unknown Role';
+
+  console.log("Username:", username);
+  console.log("User Role ID:", user_role_id);
+
+  // ฟังก์ชันดึงข้อมูลผู้ใช้จาก API
+  const fetchUserById = async (id: string) => {
+    try {
+      if (!id) {
+        messageApi.error('ไม่สามารถดึงข้อมูลผู้ใช้ได้ เนื่องจาก ID ไม่ถูกต้อง');
+        return;
+      }
+
+      const res = await getUserByIdFromService(id);
+      
+      if (res.status === 200) {
+        setUserData(res.data); 
+      } else {
+        messageApi.open({
+          type: "error",
+          content: "ไม่พบข้อมูลผู้ใช้",
+        });
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      messageApi.error('ไม่สามารถดึงข้อมูลผู้ใช้ได้');
+    }
+  };
 
   useEffect(() => {
-    // ฟังก์ชันดึงข้อมูลผู้ใช้จากฐานข้อมูล
-    const getUserById = async (id: string) => {
-      try {
-        const res = await GetUsersById(id);
-
-        if (res.status === 200) {
-          form.setFieldsValue({
-            first_name: res.data.first_name,
-            last_name: res.data.last_name,
-            email: res.data.email,
-            birthday: dayjs(res.data.birthday),
-          });
-        } else {
-          messageApi.open({
-            type: "error",
-            content: "ไม่พบข้อมูลผู้ใช้",
-          });
-          setTimeout(() => {
-            navigate("/customer");
-          }, 2000);
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-        messageApi.error('ไม่สามารถดึงข้อมูลผู้ใช้ได้');
-      }
-    };
-
-    if (id) {
-      getUserById(id);
+    if (id && id !== 'undefined') {
+      fetchUserById(id); 
+    } else {
+      messageApi.error('ไม่พบ ID ผู้ใช้');
     }
-  }, [id, messageApi, navigate, form]);
+  }, [id]);
 
   return (
     <>
@@ -70,7 +79,7 @@ function ProfileUser() {
             style={{
               width: '100%',
               maxWidth: 1400,
-              height: '80%',
+              height: 'auto',
               border: 'none',
               padding: '20px',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
@@ -91,30 +100,28 @@ function ProfileUser() {
                 />
               </Col>
             </Row>
-            <div>
-              <h1 style={{ textAlign: 'center' }}>{form.getFieldValue('first_name')} {form.getFieldValue('last_name')}</h1>
-              <h3 style={{ textAlign: 'center', color: 'gray' }}>{form.getFieldValue('email')}</h3>
-              <Col xs={24} style={{ textAlign: 'center' }}>
-                <Form form={form} name="basic" layout="vertical" autoComplete="off"></Form>
-              </Col>
+            <div style={{ textAlign: 'center' }}>
+              <h1>ยินดีต้อนรับ, {username}</h1>
+              <p>Role ID: {user_role_id}</p>
             </div>
             <div
               style={{
                 display: 'flex',
-                gap: 'large',
-                flexWrap: 'wrap',
                 justifyContent: 'center',
+                gap: '20px',
+                flexWrap: 'wrap',
+                marginTop: '20px',
               }}
             >
               <Button
-                style={{ width: '60%', justifyContent: 'left', marginBottom: '20px' }}
-                onClick={() => navigate('/user/edit/:id')}
+                style={{ width: 'calc(50% - 10px)' }}
+                onClick={() => navigate(`/users/edit/${id}`)} 
               >
                 <EditOutlined /> แก้ไขข้อมูลผู้ใช้
               </Button>
               <Button
-                style={{ width: '60%', justifyContent: 'left' }}
-                onClick={() => navigate('/user/changepassword/:id')}
+                style={{ width: 'calc(50% - 10px)' }}
+                onClick={() => navigate(`/users/changepassword/${id}`)} 
               >
                 <LockOutlined /> เปลี่ยนรหัสผ่าน
               </Button>

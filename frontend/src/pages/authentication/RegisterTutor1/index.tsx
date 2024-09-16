@@ -1,18 +1,40 @@
-import { Button, Card, Form, Input, message, Row, Col, DatePicker, Select } from "antd";
-import { ArrowLeftOutlined } from "@ant-design/icons";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { ArrowLeftOutlined, PlusOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 import { CreateUser } from "../../../services/https";
 import { UsersInterface } from "../../../interfaces/IUser";
 import logo1 from "../../../assets/logo1.png";
+import type { GetProp, UploadFile, UploadProps } from "antd";
+import ImgCrop from "antd-img-crop";
+import { Button, Card, Form, Input, message, Row, Col, DatePicker, Upload, Select } from "antd";
 
-function SignUpTutor1Pages() {
+type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
+
+function SignUpTutorPages() {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
-  const location = useLocation();
-  const { UserRoleID } = location.state || {}; // ดึง UserRoleID จาก state
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+  const onChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
+  };
+
+  const onPreview = async (file: UploadFile) => {
+    let src = file.url as string;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file.originFileObj as File);
+        reader.onload = () => resolve(reader.result as string);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
 
   const onFinish = async (values: UsersInterface) => {
-    values.UserRoleID = UserRoleID;
 
     let res = await CreateUser(values);
 
@@ -23,7 +45,7 @@ function SignUpTutor1Pages() {
       });
 
       setTimeout(() => {
-        navigate("/tutorsignup2");
+        navigate("/");
       }, 2000);
     } else {
       messageApi.open({
@@ -37,24 +59,10 @@ function SignUpTutor1Pages() {
     <>
       {contextHolder}
       <Row style={{ height: "100vh", backgroundColor: "#FFFF" }}>
-        <Col
-          xs={24}
-          sm={4}
-          md={4}
-          lg={4}
-          xl={4}
-          style={{
-            backgroundColor: "#333D51",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            flexDirection: "column",
-            position: "relative"
-          }}
-        >
+        <Col xs={24} sm={4} md={4} lg={4} xl={4} style={{ backgroundColor: "#333D51", display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", position: "relative" }}>
           <img
             alt="logo"
-            style={{ width: "50%", marginTop: "-200%" }}
+            style={{ width: "50%" , marginTop: "-200%"}}
             src={logo1}
             className="images-logo"
           />
@@ -73,17 +81,25 @@ function SignUpTutor1Pages() {
             paddingRight: "50px",
           }}
         >
-          <Card className="card-login" style={{ width: "100%", height: "100%", border: "none" , padding:"30px"}}>
+          <Card
+            className="card-login"
+            style={{ width: 1100, height: "100%", border: "none" , padding: "30px" }}
+          >
             <Button
               type="link"
               onClick={() => navigate(-1)}
-              style={{ position: "absolute", top: "10px", left: "10px", fontSize: "16px" }}
+              style={{
+                position: "absolute",
+                top: "10px",
+                left: "10px",
+                fontSize: "16px",
+              }}
             >
               <ArrowLeftOutlined /> ย้อนกลับ
             </Button>
             <Row align={"middle"} justify={"center"}>
               <Col xs={24} sm={20} md={20} lg={20} xl={20}>
-                <h2 className="header" style={{ marginBottom: "50px",textAlign:'center' }}>
+                <h2 className="header" style={{ marginBottom: "50px" , textAlign: 'center'}}>
                   Tutor Account Sign Up
                 </h2>
 
@@ -192,11 +208,10 @@ function SignUpTutor1Pages() {
                       <Form.Item
                         label="Confirm Password"
                         name="confirmPassword"
-                        dependencies={['password']}
                         rules={[
                           {
                             required: true,
-                            message: "กรุณากรอกการยืนยันรหัสผ่าน !",
+                            message: "กรุณากรอกรหัสผ่าน !",
                           },
                           ({ getFieldValue }) => ({
                             validator(_, value) {
@@ -212,11 +227,10 @@ function SignUpTutor1Pages() {
                       </Form.Item>
                     </Col>
 
-                    {/* เพิ่มฟิลด์สำหรับเลือกเพศ */}
-                    <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                    <Col xs={24} sm={24} md={24} lg={12} xl={12}>
                       <Form.Item
                         label="เพศ"
-                        name="gender"
+                        name="gender_id"
                         rules={[
                           {
                             required: true,
@@ -225,24 +239,68 @@ function SignUpTutor1Pages() {
                         ]}
                       >
                         <Select
-                          placeholder="กรุณาเลือกเพศ"
+                          defaultValue=""
+                          style={{ width: "100%" }}
                           options={[
-                            { value: "male", label: "ชาย" },
-                            { value: "female", label: "หญิง" },
+                            { value: "", label: "กรุณาเลือกเพศ", disabled: true },
+                            { value: 1, label: "Male" },
+                            { value: 2, label: "Female" },
                           ]}
                         />
                       </Form.Item>
                     </Col>
 
-                    <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+                    <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                      <Form.Item
+                        label="รูปประจำตัว"
+                        name="profile"
+                        valuePropName="fileList"
+                      >
+                        <ImgCrop rotationSlider>
+                          <Upload
+                            fileList={fileList}
+                            onChange={onChange}
+                            onPreview={onPreview}
+                            beforeUpload={(file) => {
+                              setFileList([file]);
+                              return false;
+                            }}
+                            maxCount={1}
+                            multiple={false}
+                            listType="picture-card"
+                          >
+                            <div>
+                              <PlusOutlined />
+                              <div style={{ marginTop: 8 }}>
+                                คลิกเพื่ออัพโหลด
+                              </div>
+                            </div>
+                          </Upload>
+                        </ImgCrop>
+                      </Form.Item>
+                    </Col>
+
+                    {/* New Field for User Role */}
+                    
+                    <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+  <Form.Item
+    label="Role"
+    name="user_role_id"
+    initialValue={2} // This is the value for 'Student'
+    noStyle
+  >
+    <Input type="hidden" value={2} />
+  </Form.Item>
+  <Form.Item label="Role Display">
+    <Input disabled value="This is Tutor User!" />
+  </Form.Item>
+</Col>
+
+
+                    <Col span={24}>
                       <Form.Item>
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          className="login-form-button"
-                          style={{ marginBottom: 20 }}
-                        >
-                          ถัดไป
+                        <Button type="primary" htmlType="submit" className="login-from-button" style={{ width: "100%" }}>
+                          สมัครสมาชิก
                         </Button>
                       </Form.Item>
                     </Col>
@@ -257,4 +315,4 @@ function SignUpTutor1Pages() {
   );
 }
 
-export default SignUpTutor1Pages;
+export default SignUpTutorPages;

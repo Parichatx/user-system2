@@ -1,18 +1,9 @@
-import { useEffect } from "react";
-import {
-  Space,
-  Button,
-  Col,
-  Row,
-  Divider,
-  Form,
-  Input,
-  Card,
-  message,
-} from "antd";
+import React from "react";
+import { Space, Button, Col, Row, Divider, Form, Input, Card, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate, Link, useParams } from "react-router-dom";
 import HeaderComponent from '../../../components/header/index';
+import { UpdatePasswordById } from "../../../services/https/index";
 
 function ChangePassword() {
   const navigate = useNavigate();
@@ -20,39 +11,39 @@ function ChangePassword() {
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
 
-  // ฟังก์ชันเปลี่ยนรหัสผ่าน
   const onFinish = async (values: any) => {
+    if (!id) {
+      messageApi.error('ID ผู้ใช้ไม่พบ');
+      return;
+    }
+
     try {
-      let payload = { ...values };
-      // แทนที่ `UpdateUsersById` ด้วยฟังก์ชันที่ใช้สำหรับเปลี่ยนรหัสผ่าน
+      // ใช้ชื่อฟิลด์ที่ตรงกับที่คาดหวัง
+      const payload = {
+        current_password: values.current_password, // ใช้ชื่อฟิลด์ที่คาดหวัง
+        new_password: values.new_password,         // ใช้ชื่อฟิลด์ที่คาดหวัง
+      };
+
       const res = await UpdatePasswordById(id, payload);
+
       if (res.status === 200) {
-        messageApi.open({
-          type: "success",
-          content: res.data.message,
-        });
+        messageApi.success(res.data.message || 'รหัสผ่านถูกเปลี่ยนเรียบร้อยแล้ว');
         setTimeout(() => {
-          navigate("/customer");
+          navigate("/profileuser");
         }, 2000);
       } else {
-        messageApi.open({
-          type: "error",
-          content: res.data.error || 'ไม่สามารถเปลี่ยนรหัสผ่านได้',
-        });
+        messageApi.error(res.data.error || 'ไม่สามารถเปลี่ยนรหัสผ่านได้');
       }
     } catch (error) {
       console.error('Error updating password:', error);
-      messageApi.open({
-        type: "error",
-        content: 'ไม่สามารถเปลี่ยนรหัสผ่านได้',
-      });
+      messageApi.error('ไม่สามารถเปลี่ยนรหัสผ่านได้');
     }
   };
 
   return (
     <div>
       {contextHolder}
-      <HeaderComponent/>
+      <HeaderComponent />
       <Row style={{ height: '100vh', backgroundColor: '#FFFFFF', margin: 0 }}>
         <Col
           xs={24}
@@ -78,7 +69,7 @@ function ChangePassword() {
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
             }}
           >
-            <h2 style={{ textAlign: 'center',}}>เปลี่ยนรหัสผ่าน</h2>
+            <h2 style={{ textAlign: 'center' }}>เปลี่ยนรหัสผ่าน</h2>
             <Divider />
             <Form
               name="change-password"
@@ -92,9 +83,7 @@ function ChangePassword() {
                   <Form.Item
                     label="รหัสผ่านเดิม"
                     name="current_password"
-                    rules={[
-                      { required: true, message: "กรุณากรอกรหัสผ่านเดิม !" },
-                    ]}
+                    rules={[{ required: true, message: "กรุณากรอกรหัสผ่านเดิม!" }]}
                   >
                     <Input.Password />
                   </Form.Item>
@@ -103,9 +92,7 @@ function ChangePassword() {
                   <Form.Item
                     label="รหัสผ่านใหม่"
                     name="new_password"
-                    rules={[
-                      { required: true, message: "กรุณากรอกรหัสผ่านใหม่ !" },
-                    ]}
+                    rules={[{ required: true, message: "กรุณากรอกรหัสผ่านใหม่!" }]}
                   >
                     <Input.Password />
                   </Form.Item>
@@ -115,7 +102,7 @@ function ChangePassword() {
                     label="ยืนยันรหัสผ่านใหม่"
                     name="confirm_password"
                     rules={[
-                      { required: true, message: "กรุณายืนยันรหัสผ่านใหม่ !" },
+                      { required: true, message: "กรุณายืนยันรหัสผ่านใหม่!" },
                       ({ getFieldValue }) => ({
                         validator(_, value) {
                           if (!value || getFieldValue('new_password') === value) {
