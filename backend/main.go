@@ -8,6 +8,7 @@ import (
 	"github.com/Parichatx/user-system2/config"
 	"github.com/Parichatx/user-system2/middlewares"
 	"github.com/Parichatx/user-system2/controller/users"
+	"github.com/Parichatx/user-system2/controller/tutorProfiles" // นำเข้าคอนโทรลเลอร์สำหรับ tutor profiles
 	"github.com/joho/godotenv"
 )
 
@@ -44,6 +45,13 @@ func main() {
 		router.GET("/:id", users.Get)
 		router.DELETE("/:id", users.Delete)
 	}
+
+	// เส้นทางสำหรับ tutor profiles
+	r.GET("/tutor-profile/:id", tutorProfiles.GetTutorProfile)
+	r.GET("/tutor-profile/by-user/:UserID", tutorProfiles.GetTutorProfileByUserID)
+	r.POST("/tutor-profile", tutorProfiles.CreateTutorProfile)
+	r.PATCH("/tutor-profile/:id", tutorProfiles.UpdateTutorProfile)
+	r.DELETE("/tutor-profile/:id", tutorProfiles.DeleteTutorProfile)
 
 	// เส้นทางตรวจสอบสถานะ API
 	r.GET("/", func(c *gin.Context) {

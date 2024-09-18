@@ -9,32 +9,27 @@ import {
   Input,
   Card,
   message,
-  Upload,
-  InputNumber,
-  Select,
 } from "antd";
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import { UsersInterface } from "../../../interfaces/IUser";
-import { GetUsersById, UpdateUsersById } from "../../../services/https/index";
+import { GetUserById, UpdateUserById } from "../../../services/https/index";
 import { useNavigate, Link, useParams } from "react-router-dom";
-import dayjs from "dayjs";
-import HeaderComponent from '../../../components/headertutor/index';
+//import HeaderComponent from '../../../components/headertutor/index';
 
-function EditUser() {
+function EditTutor() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: any }>();
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
 
+  // Fetch user data by ID
   const getUserById = async (id: string) => {
-    let res = await GetUsersById(id);
+    let res = await GetUserById(id);
     if (res.status === 200) {
       form.setFieldsValue({
-        name: res.data.name,
         biography: res.data.biography,
         education: res.data.education,
         experience: res.data.experience,
-        profilePicture: res.data.profilePicture, // Assuming profilePicture URL
       });
     } else {
       messageApi.open({
@@ -47,19 +42,19 @@ function EditUser() {
     }
   };
 
+  // Update user data
   const onFinish = async (values: UsersInterface) => {
     let payload = {
       ...values,
-      // Add the logic to handle file uploads if necessary
     };
-    const res = await UpdateUsersById(id, payload);
+    const res = await UpdateUserById(id, payload);
     if (res.status === 200) {
       messageApi.open({
         type: "success",
         content: res.data.message,
       });
       setTimeout(() => {
-        navigate("/customer");
+        navigate("/profileuser");
       }, 2000);
     } else {
       messageApi.open({
@@ -69,24 +64,6 @@ function EditUser() {
     }
   };
 
-  const handleUploadChange = ({ file, fileList }) => {
-    if (file.status === 'done') {
-      message.success(`${file.name} file uploaded successfully`);
-      // Optionally update the form value with the file URL
-      form.setFieldsValue({ profilePicture: file.response.url });
-    } else if (file.status === 'error') {
-      message.error(`${file.name} file upload failed.`);
-    }
-  };
-
-  const beforeUpload = (file) => {
-    const isImage = file.type.startsWith('image/');
-    if (!isImage) {
-      message.error('You can only upload image files!');
-    }
-    return isImage;
-  };
-
   useEffect(() => {
     getUserById(id);
   }, [id]);
@@ -94,9 +71,9 @@ function EditUser() {
   return (
     <div>
       {contextHolder}
-      <HeaderComponent />
-      <Row style={{ height: '100vh', backgroundColor: '#FFFFFF', margin: 0 , }}>
-        <Card className="card-profile"
+      <Row style={{ height: '100vh', backgroundColor: '#FFFFFF', margin: 0 }}>
+        <Card
+          className="card-profile"
           style={{
             marginTop: '100px',
             width: '100%',
@@ -105,7 +82,7 @@ function EditUser() {
             border: 'none',
             padding: '20px',
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-            justifyContent: 'center'
+            justifyContent: 'center',
           }}
         >
           <h2>แก้ไขข้อมูลผู้ใช้</h2>
@@ -118,28 +95,6 @@ function EditUser() {
             autoComplete="off"
           >
             <Row gutter={[16, 0]}>
-              <Col xs={24} sm={24} md={24} lg={24} xl={24}>
-                <Form.Item
-                  label="รูปโปรไฟล์"
-                  name="profilePicture"
-                  valuePropName="fileList"
-                  getValueFromEvent={(e) => e.fileList}
-                >
-                  <Upload
-                    name="file"
-                    action="/upload" // Replace with your upload URL
-                    listType="picture-card"
-                    beforeUpload={beforeUpload}
-                    onChange={handleUploadChange}
-                    showUploadList={{ showPreviewIcon: true }}
-                  >
-                    <div>
-                      <UploadOutlined />
-                      <div style={{ marginTop: 8 }}>Upload</div>
-                    </div>
-                  </Upload>
-                </Form.Item>
-              </Col>
               <Col xs={24} sm={24} md={24} lg={24} xl={24}>
                 <Form.Item
                   label="ประวัติย่อ"
@@ -210,4 +165,4 @@ function EditUser() {
   );
 }
 
-export default EditUser;
+export default EditTutor;

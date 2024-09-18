@@ -24,15 +24,15 @@ const AdminRoutes = (isLoggedIn: boolean): RouteObject => {
         element: isLoggedIn ? (userRoleId === 2 ? <TutorProfile /> : <ProfileUser />) : <MainPages />,
       },
       {
-        path: "/users",
+        path: "users", // ไม่ใช้ "/users" เพราะ path จะถูก match โดยเริ่มจาก root
         element: isLoggedIn ? (userRoleId === 2 ? <TutorProfile /> : <ProfileUser />) : <MainPages />,
         children: [
           {
-            path: "edit/:id",
-            element: isLoggedIn ? (userRoleId === 2 ? <EditTutor /> : <EditUser />) : <MainPages />,
+            path: "edit/:id", // เส้นทางสำหรับแก้ไข user
+            element: isLoggedIn ? <EditUser /> : <MainPages />,
           },
           {
-            path: "changepassword/:id",
+            path: "changepassword/:id", // เส้นทางสำหรับเปลี่ยนรหัสผ่าน
             element: isLoggedIn ? <ChangePassword /> : <MainPages />,
           },
         ],

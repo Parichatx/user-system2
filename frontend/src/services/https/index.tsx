@@ -106,6 +106,20 @@ async function UpdatePasswordById(id: string, payload: { current_password: strin
     .catch((e) => e.response);
 }
 
+// ดึงข้อมูลโปรไฟล์ของ tutor ตาม ID
+async function GetTutorProfileById(UserID: string) {
+  return await axios
+    .get(`${apiUrl}/tutor_profiles/${UserID}`, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": getAuthHeader(), // ส่ง Authorization Header ในคำขอ
+      },
+    })
+    .then((res) => res) // ส่งคืนผลลัพธ์ที่เป็น response
+    .catch((e) => e.response); // ส่งคืนข้อผิดพลาดที่เกิดขึ้น
+}
+
+
 interface LoginData {
   username: string;
   password: string;
@@ -130,5 +144,6 @@ export {
   DeleteUserById,
   CreateUser,
   UpdatePasswordById,
-  loginService
+  loginService,
+  GetTutorProfileById
 };

@@ -5,7 +5,7 @@ import { UsersInterface } from "../../../interfaces/IUser";
 import { GetUserById, UpdateUserById } from "../../../services/https/index";
 import { useNavigate, Link, useParams } from "react-router-dom";
 import dayjs from "dayjs";
-import HeaderComponent from '../../../components/header/index';
+//import HeaderComponent from '../../../components/header/index';
 
 function EditUser() {
   const navigate = useNavigate();
@@ -60,7 +60,6 @@ function EditUser() {
   return (
     <div>
       {contextHolder}
-      <HeaderComponent />
       <Row style={{ height: '100vh', backgroundColor: '#FFFFFF', margin: 0 }}>
         <Card
           className="card-profile"
@@ -133,15 +132,6 @@ function EditUser() {
                   rules={[{ required: true, message: "กรุณาเลือกวัน/เดือน/ปี เกิด !" }]}
                 >
                   <DatePicker style={{ width: "100%" }} />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={24} md={24} lg={24} xl={12}>
-                <Form.Item
-                  label="อายุ"
-                  name="age"
-                  rules={[{ required: true, message: "กรุณากรอกอายุ !" }]}
-                >
-                  <InputNumber min={0} max={99} style={{ width: "100%" }} />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={24} lg={24} xl={12}>

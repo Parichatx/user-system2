@@ -2,7 +2,7 @@ import React from "react";
 import { Space, Button, Col, Row, Divider, Form, Input, Card, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate, Link, useParams } from "react-router-dom";
-import HeaderComponent from '../../../components/header/index';
+//import HeaderComponent from '../../../components/header/index';
 import { UpdatePasswordById } from "../../../services/https/index";
 
 function ChangePassword() {
@@ -43,7 +43,7 @@ function ChangePassword() {
   return (
     <div>
       {contextHolder}
-      <HeaderComponent />
+      
       <Row style={{ height: '100vh', backgroundColor: '#FFFFFF', margin: 0 }}>
         <Col
           xs={24}

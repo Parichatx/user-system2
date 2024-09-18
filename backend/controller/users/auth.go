@@ -96,7 +96,8 @@ func SignUp(c *gin.Context) {
         Password:  hashedPassword,
         Birthday:  payload.Birthday,
         Profile:   payload.Profile,
-        UserRoleID: payload.UserRoleID, 
+        UserRoleID: payload.UserRoleID,
+        GenderID: payload.GenderID, 
     }
 
     // Save the user to the database

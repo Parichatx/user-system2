@@ -1,65 +1,62 @@
-import React, { useEffect } from 'react';
-import { Card, Col, Form, Row, message, Button } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
-import HeaderComponent from '../../components/headertutor/index';
+import React, { useEffect, useState } from 'react';
+import { Card, Col, Row, message, Button } from 'antd';
+import { useNavigate, Outlet } from 'react-router-dom'; // นำเข้า Outlet
+import HeaderComponent from '../../components/header/index';
 import studentpic from '../../assets/tutorpic.png';
-import { EditOutlined, LockOutlined } from '@ant-design/icons';
-import { GetUserById } from "../../services/https/index";
-import dayjs from 'dayjs';
+import { LockOutlined, EditOutlined } from '@ant-design/icons';
+import { GetUserById as getUserByIdFromService, GetTutorProfileById as getTutorProfileByIdFromService } from "../../services/https/index";
 
 function TutorProfile() {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
-  //const { id } = useParams(); // Assuming you have a route parameter for the user ID
- 
-  const [form] = Form.useForm();
+  const [userData, setUserData] = useState<any>(null); 
+  const [profileData, setProfileData] = useState<any>(null); 
+  const id = localStorage.getItem("id") || ""; 
 
-  const id = localStorage.getItem("id"); // ดึง id จาก localStorage
-  console.log("id:", id);
+  const fetchUserProfile = async (id: string) => {
+    try {
+      if (!id) {
+        messageApi.error('ไม่สามารถดึงข้อมูลผู้ใช้ได้ เนื่องจาก ID ไม่ถูกต้อง');
+        return;
+      }
 
- 
+      // ดึงข้อมูลผู้ใช้
+      const userRes = await getUserByIdFromService(id);
+      if (userRes.status === 200) {
+        setUserData(userRes.data);
 
-  // กำหนดค่าจาก localStorage
-  const username = localStorage.getItem('username') || 'Unknown User';
-  const user_role_id = localStorage.getItem('user_role_id') || 'Unknown Role';
-
-  console.log("Username:", username);
-  console.log("User Role ID:", user_role_id);
-  useEffect(() => {
-    // ฟังก์ชันดึงข้อมูลผู้ใช้จากฐานข้อมูล
-    const fetchUserProfile = async (id: string) => {
-      try {
-        const res = await GetUserById(id);
-
-        if (res.status === 200) {
-          form.setFieldsValue({
-            first_name: res.data.first_name,
-            last_name: res.data.last_name,
-            email: res.data.email,
-            birthday: dayjs(res.data.birthday),
-            experience: res.data.experience,
-            education: res.data.education,
-            bio: res.data.bio,
-          });
+        // ดึงข้อมูลโปรไฟล์อาจารย์
+        const profileRes = await getTutorProfileByIdFromService(id); // ส่ง id ที่ดึงมาจาก localStorage ไปที่ profile API
+        if (profileRes.status === 200) {
+          setProfileData(profileRes.data);
         } else {
           messageApi.open({
-            type: "error",
-            content: "ไม่พบข้อมูลผู้ใช้",
+            type: 'error',
+            content: 'ไม่พบข้อมูลโปรไฟล์อาจารย์',
           });
-          setTimeout(() => {
-            navigate("/tutorprofile");
-          }, 2000);
         }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-        messageApi.error('ไม่สามารถดึงข้อมูลผู้ใช้ได้');
+      } else {
+        messageApi.open({
+          type: "error",
+          content: "ไม่พบข้อมูลผู้ใช้",
+        });
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
       }
-    };
-
-    if (id) {
-      fetchUserProfile(id);
+    } catch (error) {
+      console.error('Error fetching user data or tutor profile:', error);
+      messageApi.error('ไม่สามารถดึงข้อมูลผู้ใช้หรือโปรไฟล์ได้');
     }
-  }, [id, messageApi, navigate, form]);
+  };
+
+  useEffect(() => {
+    if (id && id !== 'undefined') {
+      fetchUserProfile(id);
+    } else {
+      messageApi.error('ไม่พบ ID ผู้ใช้');
+    }
+  }, [id]);
 
   return (
     <>
@@ -86,15 +83,12 @@ function TutorProfile() {
               maxWidth: 1400,
               height: 'auto',
               border: 'none',
-              padding: '40px',
+              padding: '20px',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
             }}
           >
-            <Row align="middle" gutter={16} style={{ width: '100%' }}>
-              <Col xs={24} sm={12} style={{ textAlign: 'center' }}>
+            <Row gutter={[16, 24]} justify="center">
+              <Col xs={24} sm={12} md={8} lg={6} xl={4}>
                 <img
                   src={studentpic}
                   alt="Profile"
@@ -102,39 +96,46 @@ function TutorProfile() {
                   style={{
                     width: '100%',
                     height: 'auto',
-                    maxWidth: '300px',
+                    maxHeight: '100%',
+                    marginBottom: '20px',
                   }}
                 />
               </Col>
-              <Col xs={24} sm={12} style={{ textAlign: 'center' }}>
-                <h1>{form.getFieldValue('first_name')} {form.getFieldValue('last_name')}</h1>
-                <h3 style={{ color: 'gray' }}>{form.getFieldValue('email')}</h3>
-                <p><strong>การศึกษา:</strong> {form.getFieldValue('education')}</p>
-                <p><strong>ประสบการณ์:</strong> {form.getFieldValue('experience')}</p>
-                <div style={{ marginTop: '20px' }}>
-                  <strong>ประวัติย่อ:</strong>
-                  <p>{form.getFieldValue('bio')}</p>
-                </div>
-              </Col>
             </Row>
-            <Row gutter={16} style={{ marginTop: '20px', width: '100%' }}>
-              <Col xs={24} sm={12}>
-                <Button
-                  style={{ width: '100%' }}
-                  onClick={() => navigate('/edittutor')}
-                >
-                  <EditOutlined /> แก้ไขข้อมูลโปรไฟล์
-                </Button>
-              </Col>
-              <Col xs={24} sm={12}>
-                <Button
-                  style={{ width: '100%' }}
-                  onClick={() => navigate(`/users/changepassword/${id}`)}
-                >
-                  <LockOutlined /> เปลี่ยนรหัสผ่าน
-                </Button>
-              </Col>
-            </Row>
+            <div style={{ textAlign: 'center' }}>
+              <h1>{userData?.first_name} {userData?.last_name}</h1>
+              <h3 style={{ color: 'gray' }}>{userData?.email}</h3>
+              <p><strong>การศึกษา:</strong> {profileData?.education}</p>
+              <p><strong>ประสบการณ์:</strong> {profileData?.experience}</p>
+              <div style={{ marginTop: '20px' }}>
+                <strong>ประวัติย่อ:</strong>
+                <p>{profileData?.bio}</p>
+              </div>
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '20px',
+                flexWrap: 'wrap',
+                marginTop: '20px',
+              }}
+            >
+              <Button
+                style={{ width: 'calc(50% - 10px)' }}
+                onClick={() => navigate(`/users/edit/${id}`)}
+              >
+                <EditOutlined /> แก้ไขข้อมูลโปรไฟล์
+              </Button>
+              <Button
+                style={{ width: 'calc(50% - 10px)' }}
+                onClick={() => navigate(`/users/changepassword/${id}`)}
+              >
+                <LockOutlined /> เปลี่ยนรหัสผ่าน
+              </Button>
+            </div>
+            {/* เพิ่ม Outlet ตรงนี้เพื่อ render children routes */}
+            <Outlet />
           </Card>
         </Col>
       </Row>

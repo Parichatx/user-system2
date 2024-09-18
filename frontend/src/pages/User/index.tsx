@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Col, Row, message, Button } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Outlet } from 'react-router-dom'; // นำเข้า Outlet
 import HeaderComponent from '../../components/header/index';
 import studentpic from '../../assets/studentpic.png';
 import { LockOutlined, EditOutlined } from '@ant-design/icons';
@@ -8,20 +8,14 @@ import { GetUserById as getUserByIdFromService } from "../../services/https/inde
 
 function ProfileUser() {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState<any>(null); // เก็บข้อมูลผู้ใช้ที่ดึงมา
-  const id = localStorage.getItem("id"); // ดึง id จาก localStorage
-  console.log("id:", id);
+  const [userData, setUserData] = useState<any>(null); 
+  const id = localStorage.getItem("id");
 
   const [messageApi, contextHolder] = message.useMessage();
 
-  // กำหนดค่าจาก localStorage
   const username = localStorage.getItem('username') || 'Unknown User';
   const user_role_id = localStorage.getItem('user_role_id') || 'Unknown Role';
 
-  console.log("Username:", username);
-  console.log("User Role ID:", user_role_id);
-
-  // ฟังก์ชันดึงข้อมูลผู้ใช้จาก API
   const fetchUserById = async (id: string) => {
     try {
       if (!id) {
@@ -30,7 +24,6 @@ function ProfileUser() {
       }
 
       const res = await getUserByIdFromService(id);
-      
       if (res.status === 200) {
         setUserData(res.data); 
       } else {
@@ -126,6 +119,8 @@ function ProfileUser() {
                 <LockOutlined /> เปลี่ยนรหัสผ่าน
               </Button>
             </div>
+            {/* เพิ่ม Outlet ตรงนี้เพื่อ render children routes */}
+            <Outlet />
           </Card>
         </Col>
       </Row>
