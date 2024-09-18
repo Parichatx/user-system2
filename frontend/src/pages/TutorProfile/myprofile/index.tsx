@@ -1,31 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Col, Row, message, Button } from 'antd';
-import { useNavigate, Outlet } from 'react-router-dom'; // นำเข้า Outlet
-import HeaderComponent from '../../components/header/index';
-import studentpic from '../../assets/studentpic.png';
-import { LockOutlined, EditOutlined } from '@ant-design/icons';
-import { GetUserById as getUserByIdFromService } from "../../services/https/index";
+import { useNavigate, Outlet } from 'react-router-dom';
+import HeaderComponent from '../../../components/headertutor/index';
+import studentpic from '../../../assets/tutorpic.png';
+import { EditOutlined } from '@ant-design/icons';
+import { GetUserById as getUserByIdFromService, GetTutorProfileById as getTutorProfileByIdFromService } from "../../../services/https/index";
 
-function ProfileUser() {
+function MyProfile() {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState<any>(null); 
-  const id = localStorage.getItem("id");
-
   const [messageApi, contextHolder] = message.useMessage();
+  const [userData, setUserData] = useState<any>(null); 
+  const [profileData, setProfileData] = useState<any>(null); 
+  const id = localStorage.getItem("id") || ""; 
 
-  const username = localStorage.getItem('username') || 'Unknown User';
-  const user_role_id = localStorage.getItem('user_role_id') || 'Unknown Role';
+  console.log("Editing tutor with ID:", id);
 
-  const fetchUserById = async (id: string) => {
+  const fetchUserProfile = async (id: string) => {
     try {
       if (!id) {
         messageApi.error('ไม่สามารถดึงข้อมูลผู้ใช้ได้ เนื่องจาก ID ไม่ถูกต้อง');
         return;
       }
 
-      const res = await getUserByIdFromService(id);
-      if (res.status === 200) {
-        setUserData(res.data); 
+      // ดึงข้อมูลผู้ใช้
+      const userRes = await getUserByIdFromService(id);
+      console.log('User Response:', userRes); // เพิ่มการตรวจสอบที่นี่
+      if (userRes.status === 200) {
+        setUserData(userRes.data);
+
+        // ดึงข้อมูลโปรไฟล์อาจารย์
+        const profileRes = await getTutorProfileByIdFromService(id);
+        console.log('Profile Response:', profileRes); // เพิ่มการตรวจสอบที่นี่
+        if (profileRes.status === 200) {
+          setProfileData(profileRes.data);
+        } else {
+          messageApi.open({
+            type: 'error',
+            content: 'ไม่พบข้อมูลโปรไฟล์อาจารย์',
+          });
+        }
       } else {
         messageApi.open({
           type: "error",
@@ -36,14 +49,14 @@ function ProfileUser() {
         }, 2000);
       }
     } catch (error) {
-      console.error('Error fetching user data:', error);
-      messageApi.error('ไม่สามารถดึงข้อมูลผู้ใช้ได้');
+      console.error('Error fetching user data or tutor profile:', error);
+      messageApi.error('ไม่สามารถดึงข้อมูลผู้ใช้หรือโปรไฟล์ได้');
     }
   };
 
   useEffect(() => {
     if (id && id !== 'undefined') {
-      fetchUserById(id); 
+      fetchUserProfile(id);
     } else {
       messageApi.error('ไม่พบ ID ผู้ใช้');
     }
@@ -94,7 +107,14 @@ function ProfileUser() {
               </Col>
             </Row>
             <div style={{ textAlign: 'center' }}>
-              <h1>ยินดีต้อนรับ, {username}</h1>
+              <h1>{userData?.first_name} {userData?.last_name}</h1>
+              <h3 style={{ color: 'gray' }}>{userData?.email}</h3>
+              <p><strong>การศึกษา:</strong> {profileData?.education}</p>
+              <p><strong>ประสบการณ์:</strong> {profileData?.experience}</p>
+              <div style={{ marginTop: '20px' }}>
+                <strong>ประวัติย่อ:</strong>
+                <p>{profileData?.bio}</p>
+              </div>
             </div>
             <div
               style={{
@@ -107,18 +127,11 @@ function ProfileUser() {
             >
               <Button
                 style={{ width: 'calc(50% - 10px)' }}
-                onClick={() => navigate(`/users/edit/${id}`)} 
+                onClick={() => navigate(`/tutor_profiles/edit/${id}`)}
               >
-                <EditOutlined /> แก้ไขข้อมูลผู้ใช้
-              </Button>
-              <Button
-                style={{ width: 'calc(50% - 10px)' }}
-                onClick={() => navigate(`/users/changepassword/${id}`)} 
-              >
-                <LockOutlined /> เปลี่ยนรหัสผ่าน
+                <EditOutlined /> แก้ไขข้อมูลโปรไฟล์
               </Button>
             </div>
-            {/* เพิ่ม Outlet ตรงนี้เพื่อ render children routes */}
             <Outlet />
           </Card>
         </Col>
@@ -127,4 +140,4 @@ function ProfileUser() {
   );
 }
 
-export default ProfileUser;
+export default MyProfile;

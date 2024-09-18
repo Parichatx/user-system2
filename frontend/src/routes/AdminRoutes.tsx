@@ -10,6 +10,7 @@ const EditUser = Loadable(lazy(() => import("../pages/User/edit")));
 const ChangePassword = Loadable(lazy(() => import("../pages/User/changepassword")));
 const TutorProfile = Loadable(lazy(() => import("../pages/TutorProfile")));
 const EditTutor = Loadable(lazy(() => import("../pages/TutorProfile/edit")));
+const MyProfile = Loadable(lazy(() => import("../pages/TutorProfile/myprofile")));
 
 const AdminRoutes = (isLoggedIn: boolean): RouteObject => {
   const userRoleId = parseInt(localStorage.getItem("user_role_id") || "0", 10);
@@ -37,6 +38,14 @@ const AdminRoutes = (isLoggedIn: boolean): RouteObject => {
           },
         ],
       },
+      {
+        path: "tutor_profiles/users/:userID",
+        element: isLoggedIn ? <MyProfile /> : <MainPages />,
+      },
+      {
+        path: "tutor_profiles/edit/:userID",
+        element: isLoggedIn ? <EditTutor /> : <MainPages />,
+      }
     ],
   };
 };

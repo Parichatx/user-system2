@@ -123,7 +123,7 @@ function HeaderComponent() {
             gap: '10px',
           }}
         >
-          <Link to="/profileuser">
+          <Link to="/users">
             {username}
           </Link>
         </div>

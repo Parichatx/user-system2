@@ -7,28 +7,11 @@ import 'antd/dist/reset.css';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
-const items: MenuItem[] = [
-  {
-    label: <Link to="/">ซื้อคอร์ส</Link>, 
-    key: 'course',
-    icon: <ShoppingCartOutlined />,
-  },
-  {
-    label: <Link to="/myCourses">คอร์สของฉัน</Link>, 
-    key: 'myCourse',
-    icon: <BookOutlined />,
-  },
-  {
-    label: <Link to="/tutorprofile">My Tutor Profile</Link>, 
-    key: 'tutorProfile',
-    icon: <BookOutlined />,
-  },
-];
-
 const { Header } = Layout;
 
 function HeaderTutor() {
   const username = localStorage.getItem('username') || 'Unknown User';
+  const userID = localStorage.getItem('id'); // ดึง userID จาก localStorage
 
   const [current, setCurrent] = useState("course");
   const navigate = useNavigate();
@@ -48,6 +31,25 @@ function HeaderTutor() {
       }, 2000);
     }
   };
+
+  // ตรวจสอบว่า userID มีค่าอยู่และสร้าง items สำหรับ Menu
+  const items: MenuItem[] = [
+    {
+      label: <Link to="/">ซื้อคอร์ส</Link>, 
+      key: 'course',
+      icon: <ShoppingCartOutlined />,
+    },
+    {
+      label: <Link to="/myCourses">คอร์สของฉัน</Link>, 
+      key: 'myCourse',
+      icon: <BookOutlined />,
+    },
+    {
+      label: userID ? <Link to={`/tutor_profiles/users/${userID}`}>My Tutor Profile</Link> : 'My Tutor Profile',
+      key: 'tutorProfile',
+      icon: <BookOutlined />,
+    },
+  ];
 
   return (
     <Header
@@ -99,13 +101,11 @@ function HeaderTutor() {
             margin: 0,
           }}
         >
-
           <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} 
             style={{
               backgroundColor: '#333D51',
             }}
           />
-
         </div>
       </ConfigProvider>
 
@@ -129,8 +129,8 @@ function HeaderTutor() {
             gap: '10px',
           }}
         >
-          <Link to="/profileuser">
-          {username}
+          <Link to={`/users`}>
+            {username}
           </Link>
         </div>
         
