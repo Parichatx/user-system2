@@ -4,11 +4,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/Parichatx/user-system2/config"
-	"github.com/Parichatx/user-system2/middlewares"
 	"github.com/Parichatx/user-system2/controller/users"
-	"github.com/Parichatx/user-system2/controller/tutor_profiles"
+	"github.com/Parichatx/user-system2/middlewares"
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
@@ -38,31 +37,23 @@ func main() {
 	})
 
 	// เส้นทางสำหรับการสมัครสมาชิกและล็อกอิน
-	authRoutes := r.Group("/auth")
-	{
-		authRoutes.POST("/signup", users.SignUp)
-		authRoutes.POST("/signin", users.SignIn)
-	}
+	r.POST("/signup", users.SignUp)
+	r.POST("/signin", users.SignIn)
 
 	// กลุ่มเส้นทางที่ต้องการการยืนยันตัวตน
-	userRoutes := r.Group("/users")
-	{
-		userRoutes.Use(middlewares.Authorizes()) // ใช้ Middleware ตรวจสอบ Authorization
-		userRoutes.PUT("/:id", users.Update)
-		userRoutes.GET("/", users.GetAll)
-		userRoutes.GET("/:id", users.Get)
-		userRoutes.DELETE("/:id", users.Delete)
-	}
+	r.PUT("/users/:id", middlewares.Authorizes(), users.Update)
+	r.GET("/users", middlewares.Authorizes(), users.GetAll)
+	r.GET("/users/:id", middlewares.Authorizes(), users.Get)
+	r.DELETE("/users/:id", middlewares.Authorizes(), users.Delete)
 
 	// เส้นทางสำหรับ tutor profiles
-	tutorProfileRoutes := r.Group("/tutor_profiles")
-	{
-		tutorProfileRoutes.GET("/:id", tutor_profiles.GetTutorProfile)
-		tutorProfileRoutes.GET("/users/:UserID", tutor_profiles.GetTutorProfileByUserID)
-		tutorProfileRoutes.POST("/", tutor_profiles.CreateTutorProfile)
-		tutorProfileRoutes.PATCH("/:id", tutor_profiles.UpdateTutorProfile)
-		tutorProfileRoutes.DELETE("/:id", tutor_profiles.DeleteTutorProfile)
-	}
+	// Route to get tutor profile by userID
+	r.GET("/tutor_profiles/:userID", GetTutorProfile)
+	//r.GET("/:id", tutor_profiles.GetTutorProfile)
+	//r.GET("/users/:id", tutor_profiles.GetTutorProfileByUserID)
+	//r.POST("/tutor_profiles", tutor_profiles.CreateTutorProfile)
+	//r.PATCH("/tutor_profiles/:id", tutor_profiles.UpdateTutorProfile)
+	//r.DELETE("/tutor_profiles/:id", tutor_profiles.DeleteTutorProfile)
 
 	// เริ่มรันเซิร์ฟเวอร์
 	r.Run("localhost:" + PORT)

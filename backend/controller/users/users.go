@@ -19,7 +19,8 @@ func GetAll(c *gin.Context) {
 
     var users []entity.Users
     db := config.DB()
-    results := db.Preload("Gender").Preload("UserRole").Find(&users)
+    // Preload related tutor_profiles data
+    results := db.Preload("Gender").Preload("UserRole").Preload("TutorProfile").Find(&users)
     if results.Error != nil {
         c.JSON(http.StatusNotFound, gin.H{"error": results.Error.Error()})
         return
@@ -30,15 +31,16 @@ func GetAll(c *gin.Context) {
 
 func Get(c *gin.Context) {
     ID := c.Param("id")
-    var users entity.Users
+    var user entity.Users
     db := config.DB()
-    results := db.Preload("Gender").Preload("UserRole").First(&users, ID)
+    // Preload related tutor_profiles data
+    results := db.Preload("Gender").Preload("UserRole").Preload("TutorProfile").First(&user, ID)
     if results.Error != nil {
         c.JSON(http.StatusNotFound, gin.H{"error": results.Error.Error()})
         return
     }
 
-    c.JSON(http.StatusOK, users)
+    c.JSON(http.StatusOK, user)
 }
 
 func Update(c *gin.Context) {

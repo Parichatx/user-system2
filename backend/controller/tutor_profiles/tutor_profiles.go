@@ -7,6 +7,7 @@ import (
 	"github.com/Parichatx/user-system2/entity"
 )
 
+
 // POST /tutor-profile
 func CreateTutorProfile(c *gin.Context) {
 	var tutorProfile entity.TutorProfiles
@@ -36,28 +37,36 @@ func CreateTutorProfile(c *gin.Context) {
 func GetTutorProfileByUserID(c *gin.Context) {
     userID := c.Param("UserID")
     var tutorProfile entity.TutorProfiles
-
     db := config.DB()
 
-    // ดึงข้อมูลโปรไฟล์ของ tutor โดยใช้ userID
-    if err := db.Preload("User").Where("user_id = ?", userID).First(&tutorProfile).Error; err != nil {
-        c.JSON(http.StatusNotFound, gin.H{"error": "Tutor profile not found"})
+    // Query the tutor profile by userID
+    result := db.Where("user_id = ?", userID).First(&tutorProfile)
+    if result.Error != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": "TutorProfile not found"})
         return
     }
-    c.JSON(http.StatusOK, tutorProfile) // ข้อมูล tutorProfile จะมีฟิลด์ experience, education, bio
+
+    c.JSON(http.StatusOK, tutorProfile)
 }
+
 
 // GET /tutor-profile/:id
 func GetTutorProfile(c *gin.Context) {
-	ID := c.Param("id")
-	var tutorProfile entity.TutorProfiles
+    userID := c.Param("UserID") // ดึง userID จาก URL
+    var profile entity.TutorProfiles
 
-	db := config.DB()
-	if err := db.Preload("User").First(&tutorProfile, ID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Tutor profile not found"})
-		return
-	}
-	c.JSON(http.StatusOK, tutorProfile)
+    // ดึงข้อมูลจากฐานข้อมูลโดยใช้ Gorm
+    if err := db.Where("user_id = ?", userID).First(&profile).Error; err != nil {
+        if err == gorm.ErrRecordNotFound {
+            c.JSON(http.StatusNotFound, gin.H{"error": "ไม่พบข้อมูลโปรไฟล์อาจารย์"})
+            return
+        }
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "เกิดข้อผิดพลาดในการดึงข้อมูล"})
+        return
+    }
+
+    // ส่งข้อมูลโปรไฟล์กลับไปยัง frontend
+    c.JSON(http.StatusOK, profile)
 }
 
 // GET /tutor-profiles
