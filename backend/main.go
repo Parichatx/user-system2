@@ -8,7 +8,7 @@ import (
 	"github.com/Parichatx/user-system2/config"
 	"github.com/Parichatx/user-system2/middlewares"
 	"github.com/Parichatx/user-system2/controller/users"
-	"github.com/Parichatx/user-system2/controller/tutorProfiles" // นำเข้าคอนโทรลเลอร์สำหรับ tutor profiles
+	"github.com/Parichatx/user-system2/controller/tutor_profiles"
 	"github.com/joho/godotenv"
 )
 
@@ -32,31 +32,37 @@ func main() {
 	// เพิ่ม Middleware สำหรับ CORS
 	r.Use(CORSMiddleware())
 
-	// เส้นทางสำหรับการสมัครสมาชิกและล็อกอิน
-	r.POST("/signup", users.SignUp)
-	r.POST("/signin", users.SignIn)
-
-	// กลุ่มเส้นทางที่ต้องการการยืนยันตัวตน
-	router := r.Group("/users")
-	{
-		router.Use(middlewares.Authorizes()) // ใช้ Middleware ตรวจสอบ Authorization
-		router.PUT("/:id", users.Update)
-		router.GET("/", users.GetAll)
-		router.GET("/:id", users.Get)
-		router.DELETE("/:id", users.Delete)
-	}
-
-	// เส้นทางสำหรับ tutor profiles
-	r.GET("/tutor-profile/:id", tutorProfiles.GetTutorProfile)
-	r.GET("/tutor-profile/by-user/:UserID", tutorProfiles.GetTutorProfileByUserID)
-	r.POST("/tutor-profile", tutorProfiles.CreateTutorProfile)
-	r.PATCH("/tutor-profile/:id", tutorProfiles.UpdateTutorProfile)
-	r.DELETE("/tutor-profile/:id", tutorProfiles.DeleteTutorProfile)
-
 	// เส้นทางตรวจสอบสถานะ API
 	r.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "API RUNNING... PORT: %s", PORT)
 	})
+
+	// เส้นทางสำหรับการสมัครสมาชิกและล็อกอิน
+	authRoutes := r.Group("/auth")
+	{
+		authRoutes.POST("/signup", users.SignUp)
+		authRoutes.POST("/signin", users.SignIn)
+	}
+
+	// กลุ่มเส้นทางที่ต้องการการยืนยันตัวตน
+	userRoutes := r.Group("/users")
+	{
+		userRoutes.Use(middlewares.Authorizes()) // ใช้ Middleware ตรวจสอบ Authorization
+		userRoutes.PUT("/:id", users.Update)
+		userRoutes.GET("/", users.GetAll)
+		userRoutes.GET("/:id", users.Get)
+		userRoutes.DELETE("/:id", users.Delete)
+	}
+
+	// เส้นทางสำหรับ tutor profiles
+	tutorProfileRoutes := r.Group("/tutor_profile")
+	{
+		tutorProfileRoutes.GET("/:id", tutor_profiles.GetTutorProfile)
+		tutorProfileRoutes.GET("/users/:UserID", tutor_profiles.GetTutorProfileByUserID)
+		tutorProfileRoutes.POST("/", tutor_profiles.CreateTutorProfile)
+		tutorProfileRoutes.PATCH("/:id", tutor_profiles.UpdateTutorProfile)
+		tutorProfileRoutes.DELETE("/:id", tutor_profiles.DeleteTutorProfile)
+	}
 
 	// เริ่มรันเซิร์ฟเวอร์
 	r.Run("localhost:" + PORT)
