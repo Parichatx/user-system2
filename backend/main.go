@@ -55,7 +55,7 @@ func main() {
 	}
 
 	// เส้นทางสำหรับ tutor profiles
-	tutorProfileRoutes := r.Group("/tutor_profile")
+	tutorProfileRoutes := r.Group("/tutor_profiles")
 	{
 		tutorProfileRoutes.GET("/:id", tutor_profiles.GetTutorProfile)
 		tutorProfileRoutes.GET("/users/:UserID", tutor_profiles.GetTutorProfileByUserID)

@@ -1,4 +1,4 @@
-package controller
+package tutor_profiles
 
 import (
 	"net/http"
