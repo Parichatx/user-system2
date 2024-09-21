@@ -6,6 +6,7 @@ import (
 
 	"github.com/Parichatx/user-system2/config"
 	"github.com/Parichatx/user-system2/controller/users"
+	"github.com/Parichatx/user-system2/controller/tutor_profiles"
 	"github.com/Parichatx/user-system2/middlewares"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -48,7 +49,7 @@ func main() {
 
 	// เส้นทางสำหรับ tutor profiles
 	// Route to get tutor profile by userID
-	r.GET("/tutor_profiles/:userID", GetTutorProfile)
+	r.GET("/tutor_profiles/users/:userID", tutor_profiles.GetTutorProfileByUserID)
 	//r.GET("/:id", tutor_profiles.GetTutorProfile)
 	//r.GET("/users/:id", tutor_profiles.GetTutorProfileByUserID)
 	//r.POST("/tutor_profiles", tutor_profiles.CreateTutorProfile)

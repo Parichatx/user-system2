@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/Parichatx/user-system2/config"
 	"github.com/Parichatx/user-system2/entity"
+	"gorm.io/gorm"
 )
 
 
@@ -51,9 +52,13 @@ func GetTutorProfileByUserID(c *gin.Context) {
 
 
 // GET /tutor-profile/:id
+// GET /tutor-profile/:id
 func GetTutorProfile(c *gin.Context) {
     userID := c.Param("UserID") // ดึง userID จาก URL
     var profile entity.TutorProfiles
+
+    // ประกาศ db ให้ถูกต้อง
+    db := config.DB()
 
     // ดึงข้อมูลจากฐานข้อมูลโดยใช้ Gorm
     if err := db.Where("user_id = ?", userID).First(&profile).Error; err != nil {
@@ -68,6 +73,7 @@ func GetTutorProfile(c *gin.Context) {
     // ส่งข้อมูลโปรไฟล์กลับไปยัง frontend
     c.JSON(http.StatusOK, profile)
 }
+
 
 // GET /tutor-profiles
 func ListTutorProfiles(c *gin.Context) {
