@@ -13,6 +13,6 @@ type TutorProfiles struct {
 	Education      string `gorm:"type:text"`
 	ProfilePicture string `gorm:"type:longtext"`
 
-	UserID uint   // ใช้ uint แทน *uint
-	User   Users  `gorm:"foreignKey:UserID"` // ชื่อฟิลด์ใน struct Users จะต้องเป็น UserID
+	UserID *uint // ใช้ pointer ที่นี่
+	User   Users  `gorm:"foreignKey:UserID"`
 }
