@@ -6,14 +6,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type TutorProfiles struct {
+type TutorProfiles struct { // edit
 	gorm.Model
-	Bio  string `json:"bio"`
-	Experience  string `json:"experience"`
-	Education     string `json:"education,omitempty"`
+	Bio  string `gorm:"type:text"`
+	Experience  string  `gorm:"type:text"`
+	Education     string  `gorm:"type:text"`
+	ProfilePicture string `gorm:"type:longtext"` // edit
 
 	// UserId ทำหน้าที่เป็น FK
 	UserID *uint
-	User   *Users `gorm:"foreignKey:UserID"`
+	Users   *Users `gorm:"foreignKey:userID"`
 	
 }
