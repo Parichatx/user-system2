@@ -14,6 +14,6 @@ type TutorProfiles struct { // edit
 
 	// UserId ทำหน้าที่เป็น FK
 	UserID *uint
-	User   Users `gorm:"foreignKey:UserID"`
+	User   Users `gorm:"foreignKey:userID"`
 	
 }

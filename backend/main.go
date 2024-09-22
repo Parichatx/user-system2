@@ -49,7 +49,7 @@ func main() {
 
 	// เส้นทางสำหรับ tutor profiles
 	// Route to get tutor profile by userID
-	r.GET("/tutor_profiles/users/:userID", tutor_profiles.GetTutorProfileByUserID)
+	r.GET("/tutor_profiles/:userID", tutor_profiles.GetTutorProfileByUserID)
 	//r.GET("/:id", tutor_profiles.GetTutorProfile)
 	//r.GET("/users/:id", tutor_profiles.GetTutorProfileByUserID)
 	//r.POST("/tutor_profiles", tutor_profiles.CreateTutorProfile)

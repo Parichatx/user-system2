@@ -90,10 +90,10 @@ func ListTutorProfiles(c *gin.Context) {
 // PATCH /tutor-profile/:id
 func UpdateTutorProfile(c *gin.Context) {
 	var tutorProfile entity.TutorProfiles
-	TutorProfileID := c.Param("id")
+	ID := c.Param("userID")
 
 	db := config.DB()
-	if err := db.First(&tutorProfile, TutorProfileID).Error; err != nil {
+	if err := db.First(&tutorProfile, ID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Tutor profile not found"})
 		return
 	}

@@ -28,7 +28,7 @@ type Users struct {
 	LoginHistories []LoginHistories `gorm:"foreignKey:UserID"`
 
 	// 1 user สามารถมีได้ 1 TutorProfile 
-	TutorProfile  []TutorProfiles  `gorm:"foreignKey:UserID"`
+	TutorProfile  []TutorProfiles  `gorm:"foreignKey:userID"`
 
 	// 1 user สามารถมีหลาย payment
 	Payments []Payments `gorm:"foreignKey:UserID"`
