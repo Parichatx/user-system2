@@ -11,7 +11,6 @@ type TutorProfiles struct { // edit
 	Bio  string 
 	Experience  string 
 	Education     string 
-	ProfilePicture string `gorm:"type:longtext"` // edit
 
 	// UserId ทำหน้าที่เป็น FK
 	UserID *uint
